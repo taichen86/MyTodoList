@@ -9,7 +9,7 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
-        <!--My Todo List-->
+        <!--Lists-->
         <scene sceneID="NSa-bg-wkL">
             <objects>
                 <tableViewController id="dVL-SU-uJQ" customClass="IndexViewController" customModule="MyTodoList" customModuleProvider="target" sceneMemberID="viewController">
@@ -32,7 +32,7 @@
                             <outlet property="delegate" destination="dVL-SU-uJQ" id="oDw-Mk-Iwi"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" title="My Todo List" id="PCL-0z-d5W"/>
+                    <navigationItem key="navigationItem" title="Lists" id="PCL-0z-d5W"/>
                     <connections>
                         <segue destination="tB3-SF-CdX" kind="show" identifier="goToList" id="DR4-P4-8wJ"/>
                     </connections>
@@ -49,14 +49,39 @@
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <label key="tableHeaderView" opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="What will you do today?" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="bN0-gl-am5" userLabel="Default">
+                            <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <fontDescription key="fontDescription" type="system" pointSize="16"/>
+                            <color key="textColor" red="0.26051741839999998" green="0.2605243921" blue="0.260520637" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            <nil key="highlightedColor"/>
+                        </label>
                         <prototypes>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="TodoItemCell" id="HeN-0P-AUw" customClass="TodoItemCell" customModule="MyTodoList" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="28" width="375" height="44"/>
+                                <rect key="frame" x="0.0" y="72" width="375" height="44"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="HeN-0P-AUw" id="Ecv-KD-3Vm">
                                     <rect key="frame" x="0.0" y="0.0" width="375" height="43.5"/>
                                     <autoresizingMask key="autoresizingMask"/>
+                                    <subviews>
+                                        <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" scrollEnabled="NO" editable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="yHe-fD-gFi">
+                                            <rect key="frame" x="10" y="10" width="355" height="23.5"/>
+                                            <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                            <fontDescription key="fontDescription" type="system" pointSize="22"/>
+                                            <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                                        </textView>
+                                    </subviews>
+                                    <color key="backgroundColor" red="0.99999600649999998" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                    <constraints>
+                                        <constraint firstItem="yHe-fD-gFi" firstAttribute="top" secondItem="Ecv-KD-3Vm" secondAttribute="top" constant="10" id="6lh-bJ-j2a"/>
+                                        <constraint firstAttribute="bottom" secondItem="yHe-fD-gFi" secondAttribute="bottom" constant="10" id="aae-k5-5hP"/>
+                                        <constraint firstAttribute="trailing" secondItem="yHe-fD-gFi" secondAttribute="trailing" constant="10" id="bPg-3G-VXS"/>
+                                        <constraint firstItem="yHe-fD-gFi" firstAttribute="leading" secondItem="Ecv-KD-3Vm" secondAttribute="leading" constant="10" id="tYd-jV-7Rq"/>
+                                    </constraints>
                                 </tableViewCellContentView>
+                                <connections>
+                                    <outlet property="textView" destination="yHe-fD-gFi" id="JwA-gD-pg2"/>
+                                </connections>
                             </tableViewCell>
                         </prototypes>
                         <connections>
@@ -64,10 +89,15 @@
                             <outlet property="delegate" destination="tB3-SF-CdX" id="T3k-wD-NFh"/>
                         </connections>
                     </tableView>
+                    <toolbarItems/>
+                    <simulatedToolbarMetrics key="simulatedBottomBarMetrics"/>
+                    <connections>
+                        <outlet property="defaultText" destination="bN0-gl-am5" id="y6t-X3-GbO"/>
+                    </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="mwq-XQ-eJT" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2681" y="116"/>
+            <point key="canvasLocation" x="2680.8000000000002" y="115.59220389805098"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="t5R-vT-xUX">

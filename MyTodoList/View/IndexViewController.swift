@@ -8,10 +8,16 @@
 
 import UIKit
 
+enum ListType {
+    case daily
+    case monthly
+    case yearly
+}
+
 class IndexViewController: UITableViewController {
 
     
-    let items = ["Daily", "Monthly", "Yearly"]
+    var items = ["Daily", "Weekly", "Monthly"]
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -29,9 +35,17 @@ class IndexViewController: UITableViewController {
         return cell
     }
     
+    var listSelected = 0
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        print("selected list \(items[indexPath.row])")
+        listSelected = indexPath.row
+        print("selected list \(items[listSelected])")
         performSegue(withIdentifier: "goToList", sender: self)
+    }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if let vc = segue.destination as? ListViewController {
+            vc.list = items[listSelected]
+        }
     }
 
 }

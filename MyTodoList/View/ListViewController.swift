@@ -8,29 +8,154 @@
 
 import UIKit
 
+extension ListViewController: UITextViewDelegate {
+    func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
+  //      print("pressed letter \(text)")
+//        print("tx view height: \(textView.frame.height )")
+        tableView.rowHeight = UITableViewAutomaticDimension
+        tableView.estimatedRowHeight = textView.frame.height
+        todos[textView.tag] = textView.text
+        textView.sizeToFit()
+        tableView.beginUpdates()
+        tableView.endUpdates()
+        if text == "\n" {
+            
+            textView.resignFirstResponder()
+        }
+
+        return true
+    }
+    
+    func textViewDidChange(_ textView: UITextView) {
+        
+    }
+    
+    
+}
+
 class ListViewController: UITableViewController {
 
-    var todos = ["things to do today :)"]
+    
+    @IBOutlet weak var defaultText: UILabel!
+    var todos = ["todo item 1"] // update this from user defaults
+    
+    var list = "Daily"
+    let dateFormatter = DateFormatter()
+    let defaults = UserDefaults.standard
+    var listKey = "list" // Daily 01.12.2018, Weekly 01.12.2018, Monthly 10.2018
+    var itemBeingEdited = 0
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        // TODO: disable textfields by default
+  //      view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(viewTapped)))
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: .UIKeyboardWillShow, object: nil)
+        
+        // show date
+        dateFormatter.dateFormat = "dd.MM.yyyy"
+        let date = dateFormatter.string(from: Date())
+        navigationItem.title = date
+        listKey = "daily \(date)"
+        
+        // number of rows to fill screen
+        numOfRows = todos.count
+        if numOfRows > 0 {
+            defaultText.frame.size.height = 0
+        }
+        addEmptyRows()
+        refreshTableView()
 
-        // Uncomment the following line to preserve selection between presentations
-        // self.clearsSelectionOnViewWillAppear = false
-
-        // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-        // self.navigationItem.rightBarButtonItem = self.editButtonItem
     }
 
+    func saveList() {
+        print("save list \(listKey)")
+        print(todos)
+        defaults.set(todos, forKey: listKey)
+    }
+    /*
+    @objc func viewTapped() {
+        print("viewTapped")
+        if keyboardIsUp {
+            print("end editing")
+            view.endEditing(true)
+            return
+        }
+        
+        // edit next cell
+        itemBeingEdited = todos.count
+        print("item being edited currently \(itemBeingEdited)")
+        let cell = tableView.cellForRow(at: IndexPath(row: todos.count, section: 0)) as! TodoItemCell
+        cell.textView.isEditable = true
+        cell.textView.becomeFirstResponder()
+        
+      //  view.endEditing(true)
+     //   saveList()
+    }*/
+    
+    var keyboardIsUp = false
+    @objc func keyboardWillShow() {
+        print("keyboard up")
+       keyboardIsUp = true
+    }
+    
+    @objc func keyboardWillHide() {
+        print("keyboard down")
+        keyboardIsUp = false
+    }
+    
+    // MARK: - Table view
+    func refreshRowHeight() {
+        tableView.rowHeight = UITableViewAutomaticDimension
+        tableView.estimatedRowHeight = 100.0
+        //     tableView.rowHeight = 100.0
+    }
+    
+    func addEmptyRows() {
+        var rows = 3
+        let diff = UIScreen.main.bounds.height -  tableView.contentSize.height
+        let cheight = cellHeight + 20.0 // top bottom padding
+        if diff >  CGFloat(3.0) * cheight  {
+            rows = Int(diff/cheight)
+        }
+        numOfRows += rows
+    }
+    
+    func refreshTableView() {
+        print("refreshtableview")
+        tableView.reloadData()
+        refreshRowHeight()
+    }
+    
+    // MARK: - Table view selection row
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        print("select row \(indexPath.row)")
+        
+    }
+
+    
 
     // MARK: - Table view data source
+    var cellHeight = CGFloat(44.0)
+    var numOfRows = 0
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return todos.count
+        print("num of rows \(numOfRows)")
+        return numOfRows
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "TodoItemCell", for: indexPath)
-        cell.textLabel?.text = todos[indexPath.row]
+        let cell = tableView.dequeueReusableCell(withIdentifier: "TodoItemCell", for: indexPath) as! TodoItemCell
+        cellHeight = cell.frame.height
+        if indexPath.row < todos.count {
+            print(todos[indexPath.row])
+            cell.textView.text = todos[indexPath.row]
+            cell.textView.isEditable = true
+            cell.textView.delegate = self
+            cell.textView.tag = indexPath.row
+        }else{
+            cell.textView.text = ""
+        }
+  //      print(cell.textView.text)
         return cell
     }
  
@@ -40,8 +165,7 @@ class ListViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
         // Return false if you do not want the specified item to be editable.
         return true
-    }
-    */
+    }*/
 
     /*
     // Override to support editing the table view.
