@@ -10,20 +10,37 @@ import UIKit
 
 extension ListViewController: UITextViewDelegate {
     func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
-  //      print("pressed letter \(text)")
-//        print("tx view height: \(textView.frame.height )")
-        tableView.rowHeight = UITableViewAutomaticDimension
-        tableView.estimatedRowHeight = textView.frame.height
-        todos[textView.tag] = textView.text
+        // TODO: optimise!
         textView.sizeToFit()
         tableView.beginUpdates()
         tableView.endUpdates()
         if text == "\n" {
-            
             textView.resignFirstResponder()
         }
-
         return true
+    }
+    
+    func textViewDidBeginEditing(_ textView: UITextView) {
+   //     print("did begin editing \(textView.tag)")
+        itemBeingEdited = textView.tag
+    }
+    
+    func textViewDidEndEditing(_ textView: UITextView) {
+   //     print("did end editing \(textView.tag)")
+        textView.text = textView.text.trimmingCharacters(in: .whitespaces)
+        if textView.tag < todos.count {
+        print("edit existing \(textView.tag)")
+            todos[textView.tag] = textView.text
+        }else{
+            // check for empty entry
+            if !textView.text.isEmpty {
+                todos.append(textView.text)
+                print("add new item \(textView.tag)")
+            }else{
+                print("empty string, no add")
+            }
+
+        }
     }
     
     func textViewDidChange(_ textView: UITextView) {
@@ -75,33 +92,15 @@ class ListViewController: UITableViewController {
     }
     /*
     @objc func viewTapped() {
-        print("viewTapped")
-        if keyboardIsUp {
-            print("end editing")
-            view.endEditing(true)
-            return
-        }
-        
-        // edit next cell
-        itemBeingEdited = todos.count
-        print("item being edited currently \(itemBeingEdited)")
-        let cell = tableView.cellForRow(at: IndexPath(row: todos.count, section: 0)) as! TodoItemCell
-        cell.textView.isEditable = true
-        cell.textView.becomeFirstResponder()
-        
-      //  view.endEditing(true)
-     //   saveList()
+
     }*/
     
-    var keyboardIsUp = false
     @objc func keyboardWillShow() {
         print("keyboard up")
-       keyboardIsUp = true
     }
     
     @objc func keyboardWillHide() {
         print("keyboard down")
-        keyboardIsUp = false
     }
     
     // MARK: - Table view
@@ -129,7 +128,12 @@ class ListViewController: UITableViewController {
     
     // MARK: - Table view selection row
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        print("select row \(indexPath.row)")
+   //     print("select row \(indexPath.row)")
+        // edit next cell
+        let cell = tableView.cellForRow(at: IndexPath(row: todos.count, section: 0)) as! TodoItemCell
+ //       print("enable row \(todos.count)")
+        cell.textView.isUserInteractionEnabled = true
+        cell.textView.becomeFirstResponder()
         
     }
 
@@ -139,7 +143,7 @@ class ListViewController: UITableViewController {
     var cellHeight = CGFloat(44.0)
     var numOfRows = 0
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        print("num of rows \(numOfRows)")
+   //    print("num of rows \(numOfRows)")
         return numOfRows
     }
 
@@ -149,12 +153,14 @@ class ListViewController: UITableViewController {
         if indexPath.row < todos.count {
             print(todos[indexPath.row])
             cell.textView.text = todos[indexPath.row]
-            cell.textView.isEditable = true
-            cell.textView.delegate = self
-            cell.textView.tag = indexPath.row
+            cell.textView.isUserInteractionEnabled = true
         }else{
             cell.textView.text = ""
         }
+        
+        cell.textView.tag = indexPath.row
+        cell.textView.delegate = self
+
   //      print(cell.textView.text)
         return cell
     }

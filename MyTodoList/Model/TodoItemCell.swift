@@ -19,8 +19,9 @@ class TodoItemCell: UITableViewCell {
         super.awakeFromNib()
         // Initialization code
   
+        selectionStyle = .none
         textView.returnKeyType = UIReturnKeyType.done
-        contentView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(cellTapped)))
+ //       contentView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(cellTapped)))
         
     }
 
