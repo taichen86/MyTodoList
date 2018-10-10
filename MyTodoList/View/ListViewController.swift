@@ -31,6 +31,9 @@ extension ListViewController: UITextViewDelegate {
         if textView.tag < todos.count {
         print("edit existing \(textView.tag)")
             todos[textView.tag] = textView.text
+            if textView.text.isEmpty {
+                deleteItem(index: textView.tag)
+            }
         }else{
             // check for empty entry
             if !textView.text.isEmpty {
@@ -86,8 +89,14 @@ class ListViewController: UITableViewController {
     }
     
     
-
-    // MARK: - keyboard
+    func deleteItem(index: Int) {
+        print("delete item \(index)")
+        todos.remove(at: index)
+        print(todos)
+        saveList()
+        refreshTableView()
+    }
+    
     func saveList() {
         print("save list \(listKey)")
         print(todos)
@@ -160,6 +169,7 @@ class ListViewController: UITableViewController {
             cell.textView.text = ""
         }
         
+        cell.tableView = self
         cell.textView.tag = indexPath.row
         cell.textView.delegate = self
 

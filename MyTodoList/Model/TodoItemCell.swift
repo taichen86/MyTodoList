@@ -13,6 +13,7 @@ import UIKit
 class TodoItemCell: UITableViewCell {
 
 
+    var tableView : ListViewController?
     @IBOutlet weak var textView: UITextView!
     
     var strikedAttribute : [NSAttributedStringKey:Any] =
@@ -30,23 +31,30 @@ class TodoItemCell: UITableViewCell {
           selectionStyle = .none
 //        textView.returnKeyType = UIReturnKeyType.done
  //       contentView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(cellTapped)))
-        textView.addGestureRecognizer(UISwipeGestureRecognizer(target: self, action: #selector(handleGesture)))
-        
+        let swipeLeft = UISwipeGestureRecognizer(target: self, action: #selector(swipedLeft))
+        swipeLeft.direction = .left
+        textView.addGestureRecognizer(swipeLeft)
+        let swipeRight = UISwipeGestureRecognizer(target: self, action: #selector(swipedRight))
+        swipeRight.direction = .right
+        textView.addGestureRecognizer(swipeRight)
         
     }
+    
+    @objc func swipedLeft () {
+        print("swiped left")
+        tableView?.deleteItem(index: textView.tag)
+    }
 
-
-    @objc func handleGesture (gesture: UISwipeGestureRecognizer) {
-        if gesture.direction == .right {
-            print("swipe right")
-            if isDone {
-                textView.text = textView.attributedText.string
-            }else{
-                textView.attributedText = NSAttributedString(string: textView.text, attributes: strikedAttribute)
-            }
-            isDone = !isDone
+    @objc func swipedRight () {
+        print("swiped right")
+        if isDone {
+            textView.text = textView.attributedText.string
+        }else{
+            textView.attributedText = NSAttributedString(string: textView.text, attributes: strikedAttribute)
         }
+        isDone = !isDone
     }
+        
     
     override func setSelected(_ selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)
