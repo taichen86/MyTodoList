@@ -26,7 +26,7 @@ extension ListViewController: UITextViewDelegate {
     }
     
     func textViewDidEndEditing(_ textView: UITextView) {
-   //     print("did end editing \(textView.tag)")
+        print("did end editing \(textView.tag)")
         textView.text = textView.text.trimmingCharacters(in: .whitespaces)
         if textView.tag < todos.count {
         print("edit existing \(textView.tag)")
@@ -39,15 +39,10 @@ extension ListViewController: UITextViewDelegate {
             }else{
                 print("empty string, no add")
             }
-
         }
+        saveList()
     }
-    
-    func textViewDidChange(_ textView: UITextView) {
-        
-    }
-    
-    
+  
 }
 
 class ListViewController: UITableViewController {
@@ -58,7 +53,7 @@ class ListViewController: UITableViewController {
     
     var list = "Daily"
     let dateFormatter = DateFormatter()
-    let defaults = UserDefaults.standard
+    let userdefaults = UserDefaults.standard
     var listKey = "list" // Daily 01.12.2018, Weekly 01.12.2018, Monthly 10.2018
     var itemBeingEdited = 0
     
@@ -67,13 +62,19 @@ class ListViewController: UITableViewController {
         
         // TODO: disable textfields by default
   //      view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(viewTapped)))
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: .UIKeyboardWillShow, object: nil)
+  //      NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: .UIKeyboardWillShow, object: nil)
+  //      NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: .UIKeyboardWillHide, object: nil)
         
         // show date
         dateFormatter.dateFormat = "dd.MM.yyyy"
         let date = dateFormatter.string(from: Date())
         navigationItem.title = date
         listKey = "daily \(date)"
+        
+        if let content = userdefaults.array(forKey: listKey) {
+            print("existing data for \(listKey)")
+            todos = content as! [String]
+        }
         
         // number of rows to fill screen
         numOfRows = todos.count
@@ -82,18 +83,16 @@ class ListViewController: UITableViewController {
         }
         addEmptyRows()
         refreshTableView()
-
     }
+    
+    
 
+    // MARK: - keyboard
     func saveList() {
         print("save list \(listKey)")
         print(todos)
-        defaults.set(todos, forKey: listKey)
+        userdefaults.set(todos, forKey: listKey)
     }
-    /*
-    @objc func viewTapped() {
-
-    }*/
     
     @objc func keyboardWillShow() {
         print("keyboard up")
@@ -102,22 +101,16 @@ class ListViewController: UITableViewController {
     @objc func keyboardWillHide() {
         print("keyboard down")
     }
+
+    
+    
+    
     
     // MARK: - Table view
     func refreshRowHeight() {
         tableView.rowHeight = UITableViewAutomaticDimension
         tableView.estimatedRowHeight = 100.0
         //     tableView.rowHeight = 100.0
-    }
-    
-    func addEmptyRows() {
-        var rows = 3
-        let diff = UIScreen.main.bounds.height -  tableView.contentSize.height
-        let cheight = cellHeight + 20.0 // top bottom padding
-        if diff >  CGFloat(3.0) * cheight  {
-            rows = Int(diff/cheight)
-        }
-        numOfRows += rows
     }
     
     func refreshTableView() {
@@ -137,9 +130,8 @@ class ListViewController: UITableViewController {
         
     }
 
-    
 
-    // MARK: - Table view data source
+    // MARK: - Table view initialization
     var cellHeight = CGFloat(44.0)
     var numOfRows = 0
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -147,6 +139,16 @@ class ListViewController: UITableViewController {
         return numOfRows
     }
 
+    func addEmptyRows() {
+        var rows = 3
+        let diff = UIScreen.main.bounds.height -  tableView.contentSize.height
+        let cheight = cellHeight + 20.0 // top bottom padding
+        if diff >  CGFloat(3.0) * cheight  {
+            rows = Int(diff/cheight)
+        }
+        numOfRows += rows
+    }
+    
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "TodoItemCell", for: indexPath) as! TodoItemCell
         cellHeight = cell.frame.height
