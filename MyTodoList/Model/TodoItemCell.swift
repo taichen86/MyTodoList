@@ -13,6 +13,8 @@ import UIKit
 class TodoItemCell: UITableViewCell {
 
 
+    var section = 0
+    var row = 0
     var tableView : ListViewController?
     @IBOutlet weak var textView: UITextView!
     
@@ -20,6 +22,10 @@ class TodoItemCell: UITableViewCell {
         [ .strikethroughStyle : NSUnderlineStyle.styleSingle.rawValue ,
           .font : UIFont.systemFont(ofSize: 20.0),
           .foregroundColor : UIColor.lightGray ]
+    var boldAttributes : [NSAttributedStringKey:Any] =
+        [ .font : UIFont.boldSystemFont(ofSize: 20.0) ]
+    var resetAttributes : [NSAttributedStringKey:Any] =
+        [ .font : UIFont.systemFont(ofSize: 20.0) ]
     
     var isDone = false
     override func awakeFromNib() {
@@ -33,28 +39,37 @@ class TodoItemCell: UITableViewCell {
  //       contentView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(cellTapped)))
         let swipeLeft = UISwipeGestureRecognizer(target: self, action: #selector(swipedLeft))
         swipeLeft.direction = .left
-        textView.addGestureRecognizer(swipeLeft)
+        contentView.addGestureRecognizer(swipeLeft)
         let swipeRight = UISwipeGestureRecognizer(target: self, action: #selector(swipedRight))
         swipeRight.direction = .right
-        textView.addGestureRecognizer(swipeRight)
+        contentView.addGestureRecognizer(swipeRight)
+        let doubleTap = UITapGestureRecognizer(target: self, action: #selector(doubleTapped))
+        doubleTap.numberOfTapsRequired = 2
+        contentView.addGestureRecognizer(doubleTap)
         
     }
     
     @objc func swipedLeft () {
-        print("swiped left")
-        tableView?.deleteItem(index: textView.tag)
+        print("swiped left \(section) \(row)")
+        tableView?.deleteItem(section: section, row: row)
     }
 
     @objc func swipedRight () {
-        print("swiped right")
-        if isDone {
-            textView.text = textView.attributedText.string
-        }else{
-            textView.attributedText = NSAttributedString(string: textView.text, attributes: strikedAttribute)
-        }
-        isDone = !isDone
+        print("swiped right \(section) \(row)")
+        textView.attributedText = NSAttributedString(string: textView.text, attributes: strikedAttribute) // TODO: animate
+        tableView?.completeItem(section: section, row: row)
     }
-        
+    
+    @objc func doubleTapped () {
+        print("dobule Tapped \(section) \(row)")
+        textView.isUserInteractionEnabled = true
+        textView.becomeFirstResponder()
+    }
+    
+    func setTextBold() {
+        print("set bold \(section) \(row)")
+        textView.attributedText = NSAttributedString(string: textView.text, attributes: boldAttributes)
+    }
     
     override func setSelected(_ selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)

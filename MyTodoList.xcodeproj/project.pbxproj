@@ -16,6 +16,7 @@
 		091DCAA1216B68B200645214 /* TodoItemCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 091DCAA0216B68B200645214 /* TodoItemCell.swift */; };
 		091DCAA4216B69A700645214 /* ListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 091DCAA3216B69A700645214 /* ListViewController.swift */; };
 		09BD2DBE216CC9A900CB18EE /* Data.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09BD2DBD216CC9A900CB18EE /* Data.swift */; };
+		09C45FF0216F402A006994A5 /* TodoItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09C45FEF216F402A006994A5 /* TodoItem.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -30,6 +31,7 @@
 		091DCAA0216B68B200645214 /* TodoItemCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoItemCell.swift; sourceTree = "<group>"; };
 		091DCAA3216B69A700645214 /* ListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListViewController.swift; sourceTree = "<group>"; };
 		09BD2DBD216CC9A900CB18EE /* Data.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Data.swift; sourceTree = "<group>"; };
+		09C45FEF216F402A006994A5 /* TodoItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoItem.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -79,6 +81,7 @@
 				091DCA9E216B643200645214 /* IndexItemCell.swift */,
 				091DCAA0216B68B200645214 /* TodoItemCell.swift */,
 				09BD2DBD216CC9A900CB18EE /* Data.swift */,
+				09C45FEF216F402A006994A5 /* TodoItem.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -163,6 +166,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				09C45FF0216F402A006994A5 /* TodoItem.swift in Sources */,
 				091DCA9F216B643200645214 /* IndexItemCell.swift in Sources */,
 				09BD2DBE216CC9A900CB18EE /* Data.swift in Sources */,
 				091DCA8C216B57A000645214 /* IndexViewController.swift in Sources */,

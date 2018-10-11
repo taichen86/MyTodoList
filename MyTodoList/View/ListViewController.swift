@@ -21,23 +21,25 @@ extension ListViewController: UITextViewDelegate {
     }
     
     func textViewDidBeginEditing(_ textView: UITextView) {
-   //     print("did begin editing \(textView.tag)")
+        print("did begin editing \(textView.tag)")
         itemBeingEdited = textView.tag
     }
     
     func textViewDidEndEditing(_ textView: UITextView) {
         print("did end editing \(textView.tag)")
+        textView.isUserInteractionEnabled = false
         textView.text = textView.text.trimmingCharacters(in: .whitespaces)
         if textView.tag < todos.count {
         print("edit existing \(textView.tag)")
-            todos[textView.tag] = textView.text
+            todos[textView.tag][0] = textView.text!
             if textView.text.isEmpty {
-                deleteItem(index: textView.tag)
+                deleteItem(section: sectionBeingEdited, row: itemBeingEdited)
             }
         }else{
-            // check for empty entry
+            var todo : [Any] = [""]
             if !textView.text.isEmpty {
-                todos.append(textView.text)
+                todo[0] = textView.text!
+                todos.append(todo)
                 print("add new item \(textView.tag)")
             }else{
                 print("empty string, no add")
@@ -52,13 +54,15 @@ class ListViewController: UITableViewController {
 
     
     @IBOutlet weak var defaultText: UILabel!
-    var todos = ["todo item 1"] // update this from user defaults
+    var todos = [[Any]]() // 0 - text , 1 - color
+    var dones = [[Any]]()
     
     var list = "Daily"
     let dateFormatter = DateFormatter()
     let userdefaults = UserDefaults.standard
     var listKey = "list" // Daily 01.12.2018, Weekly 01.12.2018, Monthly 10.2018
     var itemBeingEdited = 0
+    var sectionBeingEdited = 0
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -72,27 +76,53 @@ class ListViewController: UITableViewController {
         dateFormatter.dateFormat = "dd.MM.yyyy"
         let date = dateFormatter.string(from: Date())
         navigationItem.title = date
-        listKey = "daily \(date)"
+        listKey = "\(date)"
         
-        if let content = userdefaults.array(forKey: listKey) {
-            print("existing data for \(listKey)")
-            todos = content as! [String]
+        
+        if let content = userdefaults.array(forKey: "\(listKey)todo") {
+            print("existing date for todos)")
+            todos = content as! [[Any]]
+            print(todos)
+        }
+        if let content = userdefaults.array(forKey: "\(listKey)done") {
+            print("existing data for dones")
+            dones = content as! [[Any]]
+            print(dones)
         }
         
         // number of rows to fill screen
-        numOfRows = todos.count
-        if numOfRows > 0 {
+        numOfTodoRows = todos.count
+        if numOfTodoRows > 0 {
             defaultText.frame.size.height = 0
         }
         addEmptyRows()
         refreshTableView()
     }
     
-    
-    func deleteItem(index: Int) {
-        print("delete item \(index)")
-        todos.remove(at: index)
+    func completeItem(section: Int, row: Int) {
+        // complete from todo section
+        if section < 1 {
+            print("complete \(todos[row])")
+            dones.append(todos[row])
+            todos.remove(at: row)
+        }else{
+        // reopen done item
+            print("reopen \(dones[row])")
+            todos.append(dones[row])
+            dones.remove(at: row)
+        }
         print(todos)
+        print(dones)
+        tableView.reloadData()
+    }
+    
+    func deleteItem(section: Int, row: Int) {
+        print("delete item \(section) \(row)")
+        if section < 1 {
+            todos.remove(at: row)
+        }else{
+            dones.remove(at: row)
+        }
         saveList()
         refreshTableView()
     }
@@ -100,7 +130,9 @@ class ListViewController: UITableViewController {
     func saveList() {
         print("save list \(listKey)")
         print(todos)
-        userdefaults.set(todos, forKey: listKey)
+        print(dones)
+        userdefaults.set(todos, forKey: "\(listKey)A")
+        userdefaults.set(dones, forKey: "\(listKey)B")
     }
     
     @objc func keyboardWillShow() {
@@ -129,24 +161,44 @@ class ListViewController: UITableViewController {
     }
     
     // MARK: - Table view selection row
+    var highlightedCell = IndexPath(row: 0, section: 0)
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-   //     print("select row \(indexPath.row)")
-        // edit next cell
-        let cell = tableView.cellForRow(at: IndexPath(row: todos.count, section: 0)) as! TodoItemCell
- //       print("enable row \(todos.count)")
-        cell.textView.isUserInteractionEnabled = true
-        cell.textView.becomeFirstResponder()
+        print("select row \(indexPath)")
+        sectionBeingEdited = indexPath.section
+        itemBeingEdited = indexPath.row
+        if indexPath.section < 1 {
+            // press on todo item
+            if indexPath.row < todos.count {
+                let cell = tableView.cellForRow(at: IndexPath(row: indexPath.row, section: 0)) as! TodoItemCell
+                cell.setTextBold()
+                print("select item \(todos[indexPath.row][0])")
+            }else{
+                // press on empty space, edit next cell
+                let cell = tableView.cellForRow(at: IndexPath(row: todos.count, section: 0)) as! TodoItemCell
+                //       print("enable row \(todos.count)")
+                cell.textView.isUserInteractionEnabled = true
+                cell.textView.becomeFirstResponder()
+            }
+        }
+        
+
         
     }
 
 
     // MARK: - Table view initialization
     var cellHeight = CGFloat(44.0)
-    var numOfRows = 0
+    var numOfTodoRows = 0
+    var numOfDoneRows = 0
+    
+    
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-   //    print("num of rows \(numOfRows)")
-        return numOfRows
+        if section < 1 {
+            return 10
+        }
+        return dones.count
     }
+    
 
     func addEmptyRows() {
         var rows = 3
@@ -155,21 +207,45 @@ class ListViewController: UITableViewController {
         if diff >  CGFloat(3.0) * cheight  {
             rows = Int(diff/cheight)
         }
-        numOfRows += rows
+        numOfTodoRows += rows
+    }
+    
+    override func numberOfSections(in tableView: UITableView) -> Int {
+        return 2
+    }
+    
+    override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        var title = "todos"
+        if section == 1 {
+            title = "..."
+        }
+        return title
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+ //       print("\(indexPath.section) row \(indexPath.row)")
         let cell = tableView.dequeueReusableCell(withIdentifier: "TodoItemCell", for: indexPath) as! TodoItemCell
-        cellHeight = cell.frame.height
-        if indexPath.row < todos.count {
-            print(todos[indexPath.row])
-            cell.textView.text = todos[indexPath.row]
-            cell.textView.isUserInteractionEnabled = true
+        cellHeight = cell.frame.height // ?? needed
+
+        
+        // --- TODOS -----
+        if indexPath.section < 1 {
+            if indexPath.row < todos.count {
+                cell.textView.text = todos[indexPath.row][0] as! String
+            }else{
+                cell.textView.text = ""
+            }
         }else{
-            cell.textView.text = ""
+        // --- DONES -----
+            cell.textView.text = dones[indexPath.row][0] as! String
         }
         
+        cell.textView.isUserInteractionEnabled = false
+
+       
         cell.tableView = self
+        cell.section = indexPath.section
+        cell.row = indexPath.row
         cell.textView.tag = indexPath.row
         cell.textView.delegate = self
 
