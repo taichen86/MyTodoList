@@ -20,11 +20,11 @@ extension ListViewController: UITextViewDelegate {
         return true
     }
     
+    
     func textViewDidBeginEditing(_ textView: UITextView) {
         print("did begin editing \(textView.tag)")
-        itemBeingEdited = textView.tag
     }
-    
+ 
     func textViewDidEndEditing(_ textView: UITextView) {
         print("did end editing \(textView.tag)")
         textView.isUserInteractionEnabled = false
@@ -50,13 +50,16 @@ extension ListViewController: UITextViewDelegate {
   
 }
 
-class ListViewController: UITableViewController {
+class ListViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
 
-    
     @IBOutlet weak var defaultText: UILabel!
     var todos = [[Any]]() // 0 - text , 1 - color
     var dones = [[Any]]()
     
+    @IBOutlet weak var tableView: UITableView!
+    
+    
+    var currentListDate = Date()
     var list = "Daily"
     let dateFormatter = DateFormatter()
     let userdefaults = UserDefaults.standard
@@ -66,7 +69,8 @@ class ListViewController: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        tableView.delegate = self
+        tableView.dataSource = self
         // TODO: disable textfields by default
   //      view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(viewTapped)))
   //      NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: .UIKeyboardWillShow, object: nil)
@@ -74,27 +78,41 @@ class ListViewController: UITableViewController {
         
         // show date
         dateFormatter.dateFormat = "dd.MM.yyyy"
-        let date = dateFormatter.string(from: Date())
-        navigationItem.title = date
-        listKey = "\(date)"
+        loadDataForDate(listDate: Date())
+ 
+    }
+    
+    func loadDataForDate(listDate: Date) {
+        print("load data for \(listDate)")
+        currentListDate = listDate
+        let title = dateFormatter.string(from: listDate)
+        navigationItem.title = title
+        listKey = "\(title)"
         
-        
-        if let content = userdefaults.array(forKey: "\(listKey)todo") {
+        if let content = userdefaults.array(forKey: "\(listKey)A") {
             print("existing date for todos)")
             todos = content as! [[Any]]
             print(todos)
+        }else{
+            todos.removeAll()
+            print("no todos for this date")
         }
-        if let content = userdefaults.array(forKey: "\(listKey)done") {
+        
+        if let content = userdefaults.array(forKey: "\(listKey)B") {
             print("existing data for dones")
             dones = content as! [[Any]]
             print(dones)
+        }else{
+            dones.removeAll()
+            print("no dones for this date")
         }
         
         // number of rows to fill screen
         numOfTodoRows = todos.count
-        if numOfTodoRows > 0 {
-            defaultText.frame.size.height = 0
-        }
+        /*
+         if numOfTodoRows > 0 {
+         defaultText.frame.size.height = 0
+         }*/
         addEmptyRows()
         refreshTableView()
     }
@@ -113,6 +131,7 @@ class ListViewController: UITableViewController {
         }
         print(todos)
         print(dones)
+        saveList()
         tableView.reloadData()
     }
     
@@ -142,9 +161,40 @@ class ListViewController: UITableViewController {
     @objc func keyboardWillHide() {
         print("keyboard down")
     }
+    
+    @objc func doneSectionPressed() {
+        doneSectionExpanded = !doneSectionExpanded
+        var paths = [IndexPath]()
+        for count in 1 ... dones.count {
+            print("count \(count)")
+            paths.append(IndexPath(row: count-1, section: 1))
+        }
+        print(paths)
+        if doneSectionExpanded {
+            tableView.insertRows(at: paths, with: .automatic)
+        }else{
+            tableView.deleteRows(at: paths, with: .fade)
+        }
 
+    }
+
+    @IBAction func todayPressed(_ sender: UIButton) {
+        print("go to Today")
+        loadDataForDate(listDate: Date())
+    }
     
+    @IBAction func previousDayPressed(_ sender: UIButton) {
+      let previous = Calendar.current.date(byAdding: .day, value: -1, to: currentListDate)
+    loadDataForDate(listDate: previous!)
+    }
     
+    @IBAction func nextDayPressed(_ sender: UIButton) {
+        print(currentListDate)
+        
+        let next = Calendar.current.date(byAdding: .day, value: 1, to: currentListDate)
+        print(next)
+        loadDataForDate(listDate: next!)
+    }
     
     
     // MARK: - Table view
@@ -162,7 +212,7 @@ class ListViewController: UITableViewController {
     
     // MARK: - Table view selection row
     var highlightedCell = IndexPath(row: 0, section: 0)
-    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         print("select row \(indexPath)")
         sectionBeingEdited = indexPath.section
         itemBeingEdited = indexPath.row
@@ -172,84 +222,109 @@ class ListViewController: UITableViewController {
                 let cell = tableView.cellForRow(at: IndexPath(row: indexPath.row, section: 0)) as! TodoItemCell
                 cell.setTextBold()
                 print("select item \(todos[indexPath.row][0])")
-            }else{
+            }
+            /*
+            else{
                 // press on empty space, edit next cell
                 let cell = tableView.cellForRow(at: IndexPath(row: todos.count, section: 0)) as! TodoItemCell
-                //       print("enable row \(todos.count)")
+            //       print("enable row \(todos.count)")
                 cell.textView.isUserInteractionEnabled = true
                 cell.textView.becomeFirstResponder()
-            }
+            }*/
         }
-        
-
-        
     }
+
 
 
     // MARK: - Table view initialization
     var cellHeight = CGFloat(44.0)
     var numOfTodoRows = 0
     var numOfDoneRows = 0
+    var doneSectionExpanded = true
+
     
-    
-    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if section < 1 {
-            return 10
+            return numOfTodoRows
+        }else{
+            if doneSectionExpanded {
+                return dones.count
+            }
+            return 0
         }
-        return dones.count
+        
     }
     
 
     func addEmptyRows() {
-        var rows = 3
+        let rows = 1
+        /*
         let diff = UIScreen.main.bounds.height -  tableView.contentSize.height
         let cheight = cellHeight + 20.0 // top bottom padding
         if diff >  CGFloat(3.0) * cheight  {
             rows = Int(diff/cheight)
-        }
+        }*/
         numOfTodoRows += rows
     }
     
-    override func numberOfSections(in tableView: UITableView) -> Int {
+    func numberOfSections(in tableView: UITableView) -> Int {
         return 2
     }
     
-    override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        var title = "todos"
+ 
+    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        var title = ""
         if section == 1 {
             title = "..."
         }
         return title
     }
     
-    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        switch section {
+        case 0:
+            return nil
+        case 1:
+            let button = UIButton(type: .system)
+            button.setTitle("completed ...", for: .normal)
+            button.addTarget(self, action: #selector(doneSectionPressed), for: .touchUpInside)
+            return button
+        default:
+            return nil
+        }
+    }
+    
+
+
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
  //       print("\(indexPath.section) row \(indexPath.row)")
         let cell = tableView.dequeueReusableCell(withIdentifier: "TodoItemCell", for: indexPath) as! TodoItemCell
-        cellHeight = cell.frame.height // ?? needed
 
-        
         // --- TODOS -----
         if indexPath.section < 1 {
             if indexPath.row < todos.count {
                 cell.textView.text = todos[indexPath.row][0] as! String
+                cell.registerDoubleTap()
+                cell.registerSwipes()
+                cell.setAsContentCell()
             }else{
-                cell.textView.text = ""
+                cell.setAsAddItemCell()
+                
             }
         }else{
         // --- DONES -----
+            cell.setAsContentCell()
             cell.textView.text = dones[indexPath.row][0] as! String
         }
         
         cell.textView.isUserInteractionEnabled = false
-
-       
         cell.tableView = self
         cell.section = indexPath.section
         cell.row = indexPath.row
         cell.textView.tag = indexPath.row
         cell.textView.delegate = self
 
-  //      print(cell.textView.text)
         return cell
     }
  

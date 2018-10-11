@@ -30,19 +30,37 @@ class TodoItemCell: UITableViewCell {
     var isDone = false
     override func awakeFromNib() {
         super.awakeFromNib()
-        
-        
-        
         // Initialization code
           selectionStyle = .none
 //        textView.returnKeyType = UIReturnKeyType.done
  //       contentView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(cellTapped)))
+
+
+    }
+    
+    @IBOutlet weak var addButton: UIButton!
+    @IBAction func addItemPressed(_ sender: UIButton) {
+        print("ADD Item")
+        
+    }
+    
+    func setAsContentCell() {
+        addButton.removeFromSuperview()
+    }
+    
+    func setAsAddItemCell() {
+    }
+    
+    func registerSwipes() {
         let swipeLeft = UISwipeGestureRecognizer(target: self, action: #selector(swipedLeft))
         swipeLeft.direction = .left
         contentView.addGestureRecognizer(swipeLeft)
         let swipeRight = UISwipeGestureRecognizer(target: self, action: #selector(swipedRight))
         swipeRight.direction = .right
         contentView.addGestureRecognizer(swipeRight)
+    }
+    
+    func registerDoubleTap() {
         let doubleTap = UITapGestureRecognizer(target: self, action: #selector(doubleTapped))
         doubleTap.numberOfTapsRequired = 2
         contentView.addGestureRecognizer(doubleTap)
