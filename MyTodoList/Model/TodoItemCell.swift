@@ -25,7 +25,7 @@ class TodoItemCell: UITableViewCell {
     var boldAttributes : [NSAttributedStringKey:Any] =
         [ .font : UIFont.boldSystemFont(ofSize: 20.0) ]
     var resetAttributes : [NSAttributedStringKey:Any] =
-        [ .font : UIFont.systemFont(ofSize: 20.0) ]
+        [ .font : UIFont.systemFont(ofSize: 26.0) ]
     
     var isDone = false
     override func awakeFromNib() {
@@ -41,14 +41,25 @@ class TodoItemCell: UITableViewCell {
     @IBOutlet weak var addButton: UIButton!
     @IBAction func addItemPressed(_ sender: UIButton) {
         print("ADD Item")
-        
+        tableView?.addItem()
     }
+
+    func setAsTodoCell() {
+        textView.text = ""
+        addButton.isHidden = true
+    }
+
     
-    func setAsContentCell() {
-        addButton.removeFromSuperview()
+    var isStriked = false
+    func setAsDoneCell()
+    {
+        textView.attributedText = NSAttributedString(string: textView.text, attributes: strikedAttribute)
+        addButton.isHidden = true
     }
     
     func setAsAddItemCell() {
+        textView.text = ""
+        addButton.isHidden = false
     }
     
     func registerSwipes() {
@@ -84,10 +95,18 @@ class TodoItemCell: UITableViewCell {
         textView.becomeFirstResponder()
     }
     
+    var isBold = false
     func setTextBold() {
         print("set bold \(section) \(row)")
-        textView.attributedText = NSAttributedString(string: textView.text, attributes: boldAttributes)
+        if isBold {
+            textView.text = textView.attributedText.string
+        }else{
+            textView.attributedText = NSAttributedString(string: textView.text, attributes: boldAttributes)
+        }
+        isBold = !isBold
     }
+
+    
     
     override func setSelected(_ selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)

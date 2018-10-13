@@ -224,6 +224,7 @@
                     </view>
                     <navigationItem key="navigationItem" id="nqy-Of-WUu"/>
                     <connections>
+                        <outlet property="optionsBarHeight" destination="Xoa-SM-ZjK" id="Q6O-sS-SNj"/>
                         <outlet property="tableView" destination="grb-t3-gpJ" id="Rab-lg-NYt"/>
                     </connections>
                 </viewController>
