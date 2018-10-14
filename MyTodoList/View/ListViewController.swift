@@ -162,12 +162,12 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
             print("complete \(todos[row])")
             let item = todos[row]
             todos.remove(at: row)
-            tableView.deleteRows(at: [IndexPath(row: row, section: section)], with: .bottom)
+            tableView.deleteRows(at: [IndexPath(row: row, section: section)], with: .top)
+            
             dones.append(item)
             print("insert \(dones.count)")
             if doneSectionExpanded {
-                tableView.insertRows(at: [IndexPath(row: dones.count-1, section: 1)], with: .top)
-
+                tableView.insertRows(at: [IndexPath(row: self.dones.count-1, section: 1)], with: .bottom)
             }
      
         }else{
@@ -345,15 +345,6 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
             button.addTarget(self, action: #selector(doneSectionPressed), for: .touchUpInside)
             return button
         }
-        /*
-        switch section {
-        case 0:
-            return nil
-        case 1:
-         
-        default:
-            return nil
-        }*/
     }
     
     // --------   NUMBER OF ROWS IN SECTION ---------------
@@ -379,13 +370,13 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
   //      print("cellForRowAt \(indexPath.section) row \(indexPath.row)")
         let cell = tableView.dequeueReusableCell(withIdentifier: "TodoItemCell", for: indexPath) as! TodoItemCell
         
-        
-        // --- TODOS -----
+                // --- TODOS -----
         if indexPath.section < 1 {
             if indexPath.row < todos.count {
-                cell.setAsTodoCell()
+                cell.hideAddButton()
                 cell.textView.text = todos[indexPath.row][0] as! String
-                    //+ " section \(indexPath.section) + row \(indexPath.row)"
+                cell.setAsTodoCell()
+
                 cell.registerDoubleTap()
                 cell.registerSwipes()
             }else{

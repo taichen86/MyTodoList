@@ -25,7 +25,7 @@ class TodoItemCell: UITableViewCell {
     var boldAttributes : [NSAttributedStringKey:Any] =
         [ .font : UIFont.boldSystemFont(ofSize: 20.0) ]
     var resetAttributes : [NSAttributedStringKey:Any] =
-        [ .font : UIFont.systemFont(ofSize: 26.0) ]
+        [ .font : UIFont.systemFont(ofSize: 20.0) ]
     
     var isDone = false
     override func awakeFromNib() {
@@ -45,10 +45,12 @@ class TodoItemCell: UITableViewCell {
     }
 
     func setAsTodoCell() {
-        textView.text = ""
-        addButton.isHidden = true
+        textView.attributedText = NSAttributedString(string: textView.text, attributes: resetAttributes)
     }
 
+    func hideAddButton() {
+        addButton.isHidden = true
+    }
     
     var isStriked = false
     func setAsDoneCell()
