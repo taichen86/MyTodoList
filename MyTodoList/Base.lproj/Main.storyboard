@@ -130,8 +130,8 @@
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="grb-t3-gpJ">
-                                <rect key="frame" x="0.0" y="0.0" width="375" height="620.5"/>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" bounces="NO" bouncesZoom="NO" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="grb-t3-gpJ">
+                                <rect key="frame" x="0.0" y="0.0" width="375" height="590.5"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <prototypes>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="TodoItemCell" id="8ZX-6m-HWP" customClass="TodoItemCell" customModule="MyTodoList" customModuleProvider="target">
@@ -173,7 +173,7 @@
                                     </tableViewCell>
                                 </prototypes>
                             </tableView>
-                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="AN9-4k-XgT" userLabel="Options">
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="AN9-4k-XgT" userLabel="Date Bar">
                                 <rect key="frame" x="0.0" y="620.5" width="375" height="46.5"/>
                                 <subviews>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="4Ts-s9-Yv5">
@@ -208,17 +208,79 @@
                                     <constraint firstItem="gTM-9V-uAr" firstAttribute="centerY" secondItem="AN9-4k-XgT" secondAttribute="centerY" id="xOk-Mt-4kD"/>
                                 </constraints>
                             </view>
+                            <view hidden="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="FtC-RU-JK1" userLabel="Item Bar">
+                                <rect key="frame" x="0.0" y="620.5" width="375" height="46.5"/>
+                                <subviews>
+                                    <stackView opaque="NO" contentMode="scaleToFill" distribution="equalSpacing" translatesAutoresizingMaskIntoConstraints="NO" id="8sa-o3-9j3" userLabel="Colors">
+                                        <rect key="frame" x="10" y="6.5" width="355" height="34"/>
+                                        <subviews>
+                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="UOV-0b-s6a" userLabel="Color 1">
+                                                <rect key="frame" x="0.0" y="0.0" width="30" height="34"/>
+                                                <color key="backgroundColor" red="0.99999600649999998" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                <connections>
+                                                    <action selector="previousDayPressed:" destination="j8E-Ih-Wpi" eventType="touchUpInside" id="nXX-rQ-ECo"/>
+                                                </connections>
+                                            </button>
+                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="s5M-ya-4FT" userLabel="Color 2">
+                                                <rect key="frame" x="65" y="0.0" width="30" height="34"/>
+                                                <color key="backgroundColor" red="0.99999600649999998" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                <connections>
+                                                    <action selector="previousDayPressed:" destination="j8E-Ih-Wpi" eventType="touchUpInside" id="70J-CL-Fmv"/>
+                                                </connections>
+                                            </button>
+                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="YZW-TW-oBD" userLabel="Color 3">
+                                                <rect key="frame" x="130" y="0.0" width="30" height="34"/>
+                                                <color key="backgroundColor" red="0.99999600649999998" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                <connections>
+                                                    <action selector="previousDayPressed:" destination="j8E-Ih-Wpi" eventType="touchUpInside" id="kFe-gL-wgR"/>
+                                                </connections>
+                                            </button>
+                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="gc5-7n-AOl" userLabel="Color 4">
+                                                <rect key="frame" x="195" y="0.0" width="30" height="34"/>
+                                                <color key="backgroundColor" red="0.99999600649999998" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                <connections>
+                                                    <action selector="previousDayPressed:" destination="j8E-Ih-Wpi" eventType="touchUpInside" id="Fjr-Jz-kzt"/>
+                                                </connections>
+                                            </button>
+                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="hSs-IK-LRu" userLabel="Color 5">
+                                                <rect key="frame" x="260" y="0.0" width="30" height="34"/>
+                                                <color key="backgroundColor" red="0.99999600649999998" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                <connections>
+                                                    <action selector="previousDayPressed:" destination="j8E-Ih-Wpi" eventType="touchUpInside" id="h56-cK-9dp"/>
+                                                </connections>
+                                            </button>
+                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="mhW-If-UQA" userLabel="Color 6">
+                                                <rect key="frame" x="325" y="0.0" width="30" height="34"/>
+                                                <color key="backgroundColor" red="0.99999600649999998" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                <connections>
+                                                    <action selector="previousDayPressed:" destination="j8E-Ih-Wpi" eventType="touchUpInside" id="T1Q-iU-B81"/>
+                                                </connections>
+                                            </button>
+                                        </subviews>
+                                    </stackView>
+                                </subviews>
+                                <color key="backgroundColor" red="0.92143100499999997" green="0.92145264149999995" blue="0.92144101860000005" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <constraints>
+                                    <constraint firstAttribute="trailing" secondItem="8sa-o3-9j3" secondAttribute="trailing" constant="10" id="0cK-3U-LvF"/>
+                                    <constraint firstItem="8sa-o3-9j3" firstAttribute="leading" secondItem="FtC-RU-JK1" secondAttribute="leading" constant="10" id="hbB-ua-aO5"/>
+                                    <constraint firstItem="8sa-o3-9j3" firstAttribute="centerY" secondItem="FtC-RU-JK1" secondAttribute="centerY" id="m9K-qr-tC8"/>
+                                </constraints>
+                            </view>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstAttribute="trailing" secondItem="grb-t3-gpJ" secondAttribute="trailing" id="0gL-gK-a6Z"/>
+                            <constraint firstAttribute="bottom" secondItem="FtC-RU-JK1" secondAttribute="bottom" id="4ow-I8-KIc"/>
                             <constraint firstItem="grb-t3-gpJ" firstAttribute="top" secondItem="ebj-gL-cAJ" secondAttribute="top" id="5ih-9h-xbg"/>
                             <constraint firstItem="AN9-4k-XgT" firstAttribute="height" secondItem="ebj-gL-cAJ" secondAttribute="height" multiplier="0.07" id="Xoa-SM-ZjK"/>
                             <constraint firstAttribute="trailing" secondItem="AN9-4k-XgT" secondAttribute="trailing" id="ctT-Ha-XBf"/>
                             <constraint firstItem="AN9-4k-XgT" firstAttribute="leading" secondItem="ebj-gL-cAJ" secondAttribute="leading" id="dG7-Hb-XtP"/>
                             <constraint firstAttribute="bottom" secondItem="AN9-4k-XgT" secondAttribute="bottom" id="h5t-lN-suh"/>
                             <constraint firstItem="grb-t3-gpJ" firstAttribute="leading" secondItem="ebj-gL-cAJ" secondAttribute="leading" id="ieZ-3y-Jy9"/>
-                            <constraint firstItem="AN9-4k-XgT" firstAttribute="top" secondItem="grb-t3-gpJ" secondAttribute="bottom" id="xuU-p9-pz0"/>
+                            <constraint firstItem="FtC-RU-JK1" firstAttribute="height" secondItem="ebj-gL-cAJ" secondAttribute="height" multiplier="0.07" id="kwE-mi-g4E"/>
+                            <constraint firstAttribute="trailing" secondItem="FtC-RU-JK1" secondAttribute="trailing" id="rVh-sD-6uy"/>
+                            <constraint firstItem="FtC-RU-JK1" firstAttribute="leading" secondItem="ebj-gL-cAJ" secondAttribute="leading" id="vQi-fF-S1g"/>
+                            <constraint firstItem="AN9-4k-XgT" firstAttribute="top" secondItem="grb-t3-gpJ" secondAttribute="bottom" constant="30" id="xuU-p9-pz0"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="meg-90-Tke"/>
                     </view>

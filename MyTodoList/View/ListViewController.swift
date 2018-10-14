@@ -11,6 +11,7 @@ import UIKit
 extension ListViewController: UITextViewDelegate {
     func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
         // TODO: optimise!
+
         textView.sizeToFit()
         tableView.beginUpdates()
         tableView.endUpdates()
@@ -23,11 +24,6 @@ extension ListViewController: UITextViewDelegate {
     
     func textViewDidBeginEditing(_ textView: UITextView) {
         print("------- did begin editing \(textView.tag)")
-        // disable all other cells
-   //     let offset = (textView.superview?.superview as! TodoItemCell).frame.origin.y
-    //   print("offset \(offset)")
-     //   tableView.setContentOffset(CGPoint(x: 0, y: offset), animated: false)
-
 
     }
  
@@ -90,6 +86,8 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
  
     }
     
+    var deleteDir = UITableViewRowAnimation.right
+    var insertDir = UITableViewRowAnimation.left
     func loadDataForDate(listDate: Date) {
         print("load data for \(listDate)")
         currentListDate = listDate
@@ -97,24 +95,57 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
         navigationItem.title = title
         listKey = "\(title)"
         
+        // clear current list
+        let todorows = todos.count
+        print("current list todos count \(todorows)")
+        todos.removeAll()
+        var todopaths = [IndexPath]()
+        for i in 0..<todorows {
+            todopaths.append(IndexPath(row: i, section: 0))
+        }
+        print("delete current list todos")
+        tableView.deleteRows(at: todopaths, with: deleteDir)
+        
+        
+        let donerows = dones.count
+        print("current list dones count \(donerows)")
+        dones.removeAll()
+        var donepaths = [IndexPath]()
+        for i in 0..<donerows {
+            donepaths.append(IndexPath(row: i, section: 1))
+        }
+        print("delete current list dones")
+        if doneSectionExpanded {
+            tableView.deleteRows(at: donepaths, with: deleteDir)
+        }
+
+        // load new list todos
         if let content = userdefaults.array(forKey: "\(listKey)A") {
             print("existing date for todos)")
             todos = content as! [[Any]]
             print(todos)
-        }else{
-            todos.removeAll()
-            print("no todos for this date")
         }
-        
+
+        todopaths = [IndexPath]()
+        for i in 0..<todos.count {
+            todopaths.append(IndexPath(row: i, section: 0))
+        }
+        tableView.insertRows(at: todopaths, with: insertDir)
+
+        // load new list dones
         if let content = userdefaults.array(forKey: "\(listKey)B") {
             print("existing data for dones")
             dones = content as! [[Any]]
             print(dones)
-        }else{
-            dones.removeAll()
-            print("no dones for this date")
         }
-        
+        donepaths = [IndexPath]()
+        for i in 0..<dones.count {
+            donepaths.append(IndexPath(row: i, section: 1))
+        }
+        if doneSectionExpanded {
+            tableView.insertRows(at: donepaths, with: insertDir)
+        }
+
     }
     
     func addItem() {
@@ -181,8 +212,9 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
         
         if let size = (not.userInfo?[UIKeyboardFrameBeginUserInfoKey] as? NSValue)?.cgRectValue {
             print(size)
-            UIView.animate(withDuration: 0.9) {
-                self.optionsBarHeight.constant = size.height
+            UIView.animate(withDuration: 0.33) {
+                self.optionsBarHeight.constant = size.height + CGFloat(10)
+                self.view.layoutIfNeeded()
             }
 
         }
@@ -192,6 +224,7 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
         print("keyboard down")
         UIView.animate(withDuration: 0.33) {
             self.optionsBarHeight.constant = 0
+             self.view.layoutIfNeeded()
         }
         
     }
@@ -218,27 +251,48 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
 
         }else{
             tableView.deleteRows(at: paths, with: .fade)
-
         }
-
+        refreshTableView()
     }
+
+    // MARK: - Bottom bars
+    
 
     @IBAction func todayPressed(_ sender: UIButton) {
         print("go to Today")
+        let today = Date()
+        print("list date \(currentListDate)")
+        print("today \(today)")
+        if dateFormatter.string(from: currentListDate) == dateFormatter.string(from: today) {
+            print("equal")
+            return
+        }
+        if currentListDate < today {
+            deleteDir = .left
+            insertDir = .right
+        }else{
+            deleteDir = .right
+            insertDir = .left
+        }
         loadDataForDate(listDate: Date())
+        refreshTableView()
     }
     
     @IBAction func previousDayPressed(_ sender: UIButton) {
+        deleteDir = .right
+        insertDir = .left
       let previous = Calendar.current.date(byAdding: .day, value: -1, to: currentListDate)
-    loadDataForDate(listDate: previous!)
+        loadDataForDate(listDate: previous!)
+        refreshTableView()
     }
     
     @IBAction func nextDayPressed(_ sender: UIButton) {
-        print(currentListDate)
-        
+        deleteDir = .left
+        insertDir = .right
         let next = Calendar.current.date(byAdding: .day, value: 1, to: currentListDate)
         print(next)
         loadDataForDate(listDate: next!)
+        refreshTableView()
     }
     
     
@@ -275,24 +329,31 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
 
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         var title = ""
-        if section == 1 {
-            title = "..."
-        }
         return title
     }
     
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        if section < 1 {
+            return nil
+        }else{
+            let button = UIButton(type: .system)
+            if self.doneSectionExpanded {
+                button.setTitle("completed...", for: .normal)
+            }else{
+                button.setTitle("...", for: .normal)
+            }
+            button.addTarget(self, action: #selector(doneSectionPressed), for: .touchUpInside)
+            return button
+        }
+        /*
         switch section {
         case 0:
             return nil
         case 1:
-            let button = UIButton(type: .system)
-            button.setTitle("completed ...", for: .normal)
-            button.addTarget(self, action: #selector(doneSectionPressed), for: .touchUpInside)
-            return button
+         
         default:
             return nil
-        }
+        }*/
     }
     
     // --------   NUMBER OF ROWS IN SECTION ---------------
@@ -310,7 +371,6 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
                 return dones.count
             }
             return 0
- 
         }
     }
 
@@ -318,6 +378,7 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
   //      print("cellForRowAt \(indexPath.section) row \(indexPath.row)")
         let cell = tableView.dequeueReusableCell(withIdentifier: "TodoItemCell", for: indexPath) as! TodoItemCell
+        
         
         // --- TODOS -----
         if indexPath.section < 1 {
@@ -366,6 +427,9 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
    
         }
     }
+    
+    
+
  
 
     /*
