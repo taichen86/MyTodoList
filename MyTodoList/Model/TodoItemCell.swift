@@ -87,8 +87,16 @@ class TodoItemCell: UITableViewCell {
 
     @objc func swipedRight () {
         print("swiped right \(section) \(row)")
-        textView.attributedText = NSAttributedString(string: textView.text, attributes: strikedAttribute) // TODO: animate
-        tableView?.completeItem(section: section, row: row)
+        if tableView!.swipeLocked {
+            print("locked")
+            return
+        }
+        tableView?.swipeLocked = true
+        UIView.animate(withDuration: 0.3) {
+                    self.textView.attributedText = NSAttributedString(string: self.textView.text, attributes: self.strikedAttribute) // TODO: animate
+        }
+        tableView?.completeItem(section: self.section, row: self.row)
+
     }
     
     @objc func doubleTapped () {

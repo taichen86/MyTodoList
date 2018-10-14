@@ -150,40 +150,55 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
     
     func addItem() {
         let cell = tableView.cellForRow(at: IndexPath(row: todos.count, section: 0)) as! TodoItemCell
+        cell.hideAddButton()
         cell.setAsTodoCell()
         cell.textView.isUserInteractionEnabled = true
         cell.textView.becomeFirstResponder()
     }
     
-    
+    var swipeLocked = false
     func completeItem(section: Int, row: Int) {
+
         // complete from todo section
         if section < 1 {
             print("complete \(todos[row])")
             let item = todos[row]
             todos.remove(at: row)
-            tableView.deleteRows(at: [IndexPath(row: row, section: section)], with: .top)
-            
+            UIView.animate(withDuration: 0.3) {
+                self.tableView.deleteRows(at: [IndexPath(row: row, section: section)], with: .right)
+            }
             dones.append(item)
-            print("insert \(dones.count)")
             if doneSectionExpanded {
-                tableView.insertRows(at: [IndexPath(row: self.dones.count-1, section: 1)], with: .bottom)
+                DispatchQueue.main.asyncAfter(deadline: .now()+0.9) {
+                    self.tableView.insertRows(at: [IndexPath(row: self.dones.count-1, section: 1)], with: .fade)
+                    self.tableView.reloadData()
+                    self.swipeLocked = false
+                }
             }
      
         }else{
         // reopen done item
-            print("reopen \(dones[row])")
-            let item = dones[row]
-            dones.remove(at: row)
-            tableView.deleteRows(at: [IndexPath(row: row, section: section)], with: .top)
-            todos.append(item)
-            tableView.insertRows(at: [IndexPath(row: todos.count-1, section: 0)], with: .top)
-
+                print("reopen row \(row) \(dones.count)")
+                let item = dones[row]
+                dones.remove(at: row)
+            UIView.animate(withDuration: 0.3) {
+                self.tableView.deleteRows(at: [IndexPath(row: row, section: section)], with: .right)
+            }
+                todos.append(item)
+            DispatchQueue.main.asyncAfter(deadline: .now()+0.9) {
+                UIView.animate(withDuration: 0.3) {
+                    self.tableView.insertRows(at: [IndexPath(row: self.todos.count-1, section: 0)], with: .fade)
+                    self.tableView.reloadData()
+                    self.swipeLocked = false
+                }
+            }
+            
+            
         }
         print(todos)
         print(dones)
         saveList()
-        refreshTableView()
+    //    refreshTableView()
     }
     
     func deleteItem(section: Int, row: Int) {
@@ -200,9 +215,11 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
     }
     
     func saveList() {
+        /*
         print("save list \(listKey)")
         print(todos)
         print(dones)
+ */
         userdefaults.set(todos, forKey: "\(listKey)A")
         userdefaults.set(dones, forKey: "\(listKey)B")
     }
@@ -230,7 +247,6 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
     }
 
     func addAddButtonCell() {
-        print("==== insert row")
         tableView.insertRows(at: [IndexPath(row: todos.count, section: 0)], with: .top)
     }
     
@@ -326,11 +342,11 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
        return 2
     }
     
-
+/*
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         var title = ""
         return title
-    }
+    }*/
     
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         if section < 1 {
@@ -358,7 +374,7 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
         }else{
       //      return dones.count
             if doneSectionExpanded {
-                print("num of rows in section 1 \(dones.count)")
+          //      print("num of rows in section 1 \(dones.count)")
                 return dones.count
             }
             return 0
@@ -369,14 +385,18 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
   //      print("cellForRowAt \(indexPath.section) row \(indexPath.row)")
         let cell = tableView.dequeueReusableCell(withIdentifier: "TodoItemCell", for: indexPath) as! TodoItemCell
-        
+        cell.textView.isUserInteractionEnabled = false
+        cell.tableView = self
+        cell.section = indexPath.section
+        cell.row = indexPath.row
+        cell.textView.tag = indexPath.row
+        cell.textView.delegate = self
                 // --- TODOS -----
         if indexPath.section < 1 {
             if indexPath.row < todos.count {
                 cell.hideAddButton()
-                cell.textView.text = todos[indexPath.row][0] as! String
+                cell.textView.text = todos[indexPath.row][0] as! String + "  row \(cell.row)"
                 cell.setAsTodoCell()
-
                 cell.registerDoubleTap()
                 cell.registerSwipes()
             }else{
@@ -385,17 +405,12 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
             }
         }else{
         // --- DONES -----
-            cell.textView.text = dones[indexPath.row][0] as! String
+            cell.textView.text = dones[indexPath.row][0] as! String + "  row \(cell.row)"
             cell.setAsDoneCell()
             cell.registerSwipes()
         }
         
-        cell.textView.isUserInteractionEnabled = false
-        cell.tableView = self
-        cell.section = indexPath.section
-        cell.row = indexPath.row
-        cell.textView.tag = indexPath.row
-        cell.textView.delegate = self
+
         return cell
     }
     
