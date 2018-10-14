@@ -158,7 +158,7 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
     
     var swipeLocked = false
     func completeItem(section: Int, row: Int) {
-
+        swipeLocked = true
         // complete from todo section
         if section < 1 {
             print("complete \(todos[row])")
@@ -203,15 +203,17 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
     
     func deleteItem(section: Int, row: Int) {
         print("delete item \(section) \(row)")
+        swipeLocked = true
         if section < 1 {
             todos.remove(at: row)
-            numOfTodoRows -= 1
-            tableView.deleteRows(at: [IndexPath(row: row, section: section)], with: .top)
         }else{
             dones.remove(at: row)
         }
+        UIView.animate(withDuration: 0.3) {
+            self.tableView.deleteRows(at: [IndexPath(row: row, section: section)], with: .left) }
         saveList()
-        refreshTableView()
+        tableView.reloadData()
+        swipeLocked = false
     }
     
     func saveList() {

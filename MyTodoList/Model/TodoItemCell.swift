@@ -82,6 +82,10 @@ class TodoItemCell: UITableViewCell {
     
     @objc func swipedLeft () {
         print("swiped left \(section) \(row)")
+        if tableView!.swipeLocked {
+            print("locked")
+            return
+        }
         tableView?.deleteItem(section: section, row: row)
     }
 
@@ -91,7 +95,6 @@ class TodoItemCell: UITableViewCell {
             print("locked")
             return
         }
-        tableView?.swipeLocked = true
         UIView.animate(withDuration: 0.3) {
                     self.textView.attributedText = NSAttributedString(string: self.textView.text, attributes: self.strikedAttribute) // TODO: animate
         }
