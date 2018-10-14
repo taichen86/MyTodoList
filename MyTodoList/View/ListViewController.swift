@@ -10,8 +10,6 @@ import UIKit
 
 extension ListViewController: UITextViewDelegate {
     func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
-        // TODO: optimise!
-
         textView.sizeToFit()
         tableView.beginUpdates()
         tableView.endUpdates()
@@ -21,10 +19,9 @@ extension ListViewController: UITextViewDelegate {
         return true
     }
     
-    
     func textViewDidBeginEditing(_ textView: UITextView) {
         print("------- did begin editing \(textView.tag)")
-
+        tableView.isScrollEnabled = false
     }
  
     func textViewDidEndEditing(_ textView: UITextView) {
@@ -47,9 +44,11 @@ extension ListViewController: UITextViewDelegate {
             }else{
                 print("empty string, no add")
             }
-            refreshTableView()
+            tableView.reloadData()
         }
         saveList()
+        tableView.isScrollEnabled = true
+
     }
   
 }
@@ -62,6 +61,14 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
     
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var optionsBarHeight: NSLayoutConstraint!
+    
+    @IBOutlet weak var dateBar: UIView!
+    @IBOutlet weak var itemBar: UIView!
+    @IBOutlet weak var colorBtn1: UIButton!
+    @IBOutlet weak var colorBtn2: UIButton!
+    @IBOutlet weak var colorBtn3: UIButton!
+    @IBOutlet weak var colorBtn4: UIButton!
+    @IBOutlet weak var colorBtn5: UIButton!
     
     var currentListDate = Date()
     var list = "Daily"
@@ -147,7 +154,7 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
         }
 
     }
-    
+
     func addItem() {
         let cell = tableView.cellForRow(at: IndexPath(row: todos.count, section: 0)) as! TodoItemCell
         cell.hideAddButton()
@@ -159,6 +166,7 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
     var swipeLocked = false
     func completeItem(section: Int, row: Int) {
         swipeLocked = true
+        tableView.isScrollEnabled = false
         // complete from todo section
         if section < 1 {
             print("complete \(todos[row])")
@@ -173,6 +181,7 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
                     self.tableView.insertRows(at: [IndexPath(row: self.dones.count-1, section: 1)], with: .fade)
                     self.tableView.reloadData()
                     self.swipeLocked = false
+                    self.tableView.isScrollEnabled = true
                 }
             }
      
@@ -181,24 +190,29 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
                 print("reopen row \(row) \(dones.count)")
                 let item = dones[row]
                 dones.remove(at: row)
+            self.tableView.deleteRows(at: [IndexPath(row: row, section: section)], with: .right)
+/*
             UIView.animate(withDuration: 0.3) {
-                self.tableView.deleteRows(at: [IndexPath(row: row, section: section)], with: .right)
-            }
+            }*/
+            
                 todos.append(item)
+            self.tableView.insertRows(at: [IndexPath(row: self.todos.count-1, section: 0)], with: .fade)
+self.swipeLocked = false
+            self.tableView.isScrollEnabled = true
+            /*
             DispatchQueue.main.asyncAfter(deadline: .now()+0.9) {
                 UIView.animate(withDuration: 0.3) {
-                    self.tableView.insertRows(at: [IndexPath(row: self.todos.count-1, section: 0)], with: .fade)
                     self.tableView.reloadData()
-                    self.swipeLocked = false
+             
+                 //
                 }
             }
-            
+            */
             
         }
         print(todos)
         print(dones)
         saveList()
-    //    refreshTableView()
     }
     
     func deleteItem(section: Int, row: Int) {
@@ -270,12 +284,21 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
         }else{
             tableView.deleteRows(at: paths, with: .fade)
         }
-        refreshTableView()
+   //     refreshTableView()
     }
 
     // MARK: - Bottom bars
+    let colors = [UIColor(red: CGFloat(255.0/255.0), green: CGFloat(205.0/255.0), blue: CGFloat(195.0/255.0), alpha: 1.0),
+                  UIColor(red: CGFloat(245.0/255.0), green: CGFloat(255.0/255.0), blue: CGFloat(210.0/255.0), alpha: 1.0),
+                  UIColor(red: CGFloat(215.0/255.0), green: CGFloat(255.0/255.0), blue: CGFloat(215.0/255.0), alpha: 1.0),
+                  UIColor(red: CGFloat(225.0/255.0), green: CGFloat(240.0/255.0), blue: CGFloat(255.0/255.0), alpha: 1.0),
+                  UIColor.white]
+    @IBAction func colorSelected(_ sender: UIButton) {
+        print(sender.tag)
+        let cell = tableView.cellForRow(at: highlightedCell) as! TodoItemCell
+        cell.colorStripe.backgroundColor = colors[sender.tag-1]
+    }
     
-
     @IBAction func todayPressed(_ sender: UIButton) {
         print("go to Today")
         let today = Date()
@@ -293,7 +316,7 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
             insertDir = .left
         }
         loadDataForDate(listDate: Date())
-        refreshTableView()
+  //      refreshTableView()
     }
     
     @IBAction func previousDayPressed(_ sender: UIButton) {
@@ -301,7 +324,7 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
         insertDir = .left
       let previous = Calendar.current.date(byAdding: .day, value: -1, to: currentListDate)
         loadDataForDate(listDate: previous!)
-        refreshTableView()
+   //     refreshTableView()
     }
     
     @IBAction func nextDayPressed(_ sender: UIButton) {
@@ -310,45 +333,29 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
         let next = Calendar.current.date(byAdding: .day, value: 1, to: currentListDate)
         print(next)
         loadDataForDate(listDate: next!)
-        refreshTableView()
+    //   refreshTableView()
     }
     
+    func showItemBar()
+    {
+        print("show item bar")
+            dateBar.isHidden = true
+            itemBar.isHidden = false
+        
+    }
+    
+    func hideItemBar() {
+        print("hide item bar")
+        itemBar.isHidden = true
+        dateBar.isHidden = false
+        dateBar.isUserInteractionEnabled = true
+    }
     
     // MARK: - Table view
-    func refreshRowHeight() {
-        tableView.rowHeight = UITableViewAutomaticDimension
-        tableView.estimatedRowHeight = 100.0
-        //     tableView.rowHeight = 100.0
-    }
-    
-    func refreshTableView() {
-        print("refreshtableview")
-        tableView.reloadData()
-   //     refreshRowHeight()
-    }
-    
-/*
-    func addEmptyRows() {
-        let rows = 1
-        
-        let diff = UIScreen.main.bounds.height -  tableView.contentSize.height
-        let cheight = cellHeight + 20.0 // top bottom padding
-        if diff >  CGFloat(3.0) * cheight  {
-            rows = Int(diff/cheight)
-        }
-        numOfTodoRows += rows
-        refreshTableView()
-    }*/
-    
     func numberOfSections(in tableView: UITableView) -> Int {
        return 2
     }
     
-/*
-    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        var title = ""
-        return title
-    }*/
     
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         if section < 1 {
@@ -411,12 +418,9 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
             cell.setAsDoneCell()
             cell.registerSwipes()
         }
-        
-
         return cell
     }
     
-    var cellPosYs = [Float]()
     
     // --------   SELECT ROW ---------------
     var highlightedCell = IndexPath(row: 0, section: 0)
@@ -431,6 +435,8 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
                 let cell = tableView.cellForRow(at: IndexPath(row: indexPath.row, section: 0)) as! TodoItemCell
                 cell.setTextBold()
                 print("select item \(todos[indexPath.row][0])")
+                highlightedCell = indexPath
+                showItemBar()
             }
    
         }

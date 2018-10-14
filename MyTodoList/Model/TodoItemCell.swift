@@ -17,6 +17,7 @@ class TodoItemCell: UITableViewCell {
     var row = 0
     var tableView : ListViewController?
     @IBOutlet weak var textView: UITextView!
+    @IBOutlet weak var colorStripe: UIView!
     
     var strikedAttribute : [NSAttributedStringKey:Any] =
         [ .strikethroughStyle : NSUnderlineStyle.styleSingle.rawValue ,
