@@ -13,6 +13,7 @@ import UIKit
 class TodoItemCell: UITableViewCell {
 
 
+    var indexPath = IndexPath(row: 0, section: 0)
     var section = 0
     var row = 0
     var tableView : ListViewController?

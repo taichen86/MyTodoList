@@ -22,6 +22,7 @@ extension ListViewController: UITextViewDelegate {
     func textViewDidBeginEditing(_ textView: UITextView) {
         print("------- did begin editing \(textView.tag)")
         tableView.isScrollEnabled = false
+        (textView.superview?.superview as! TodoItemCell).setAsTodoCell()
     }
  
     func textViewDidEndEditing(_ textView: UITextView) {
@@ -55,20 +56,11 @@ extension ListViewController: UITextViewDelegate {
 
 class ListViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
 
-    @IBOutlet weak var defaultText: UILabel!
     var todos = [[Any]]() // 0 - text , 1 - color
     var dones = [[Any]]()
     
     @IBOutlet weak var tableView: UITableView!
-    @IBOutlet weak var optionsBarHeight: NSLayoutConstraint!
-    
-    @IBOutlet weak var dateBar: UIView!
-    @IBOutlet weak var itemBar: UIView!
-    @IBOutlet weak var colorBtn1: UIButton!
-    @IBOutlet weak var colorBtn2: UIButton!
-    @IBOutlet weak var colorBtn3: UIButton!
-    @IBOutlet weak var colorBtn4: UIButton!
-    @IBOutlet weak var colorBtn5: UIButton!
+
     
     var currentListDate = Date()
     var list = "Daily"
@@ -77,20 +69,41 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
     var listKey = "list" // Daily 01.12.2018, Weekly 01.12.2018, Monthly 10.2018
     var itemBeingEdited = 0
     var sectionBeingEdited = 0
+    var offsetY = CGFloat(0)
     
+    var bottomViewTimer = Timer()
+    var bottomViewCounter = 0
     override func viewDidLoad() {
         super.viewDidLoad()
         tableView.delegate = self
         tableView.dataSource = self
+       
         // TODO: disable textfields by default
   //      view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(viewTapped)))
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: .UIKeyboardWillShow, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: .UIKeyboardWillHide, object: nil)
         
+        bottomViewHeight.constant = 0.07 * view.bounds.height
+        print("bottom view height \(bottomViewHeight.constant)")
         // show date
         dateFormatter.dateFormat = "dd.MM.yyyy"
         loadDataForDate(listDate: Date())
  
+        bottomViewCounter = 5
+        bottomViewTimer =  Timer.scheduledTimer(timeInterval: 1.1, target: self, selector: #selector(idleTimer), userInfo: nil, repeats: true)
+       
+    }
+    
+    
+    @objc func idleTimer() {
+        if bottomViewCounter > 0 {
+            bottomViewCounter -= 1
+            print("bottom view counter \(bottomViewCounter)")
+            return
+        }
+        if bottomViewHeight.constant > 0 {
+            hideBottomView()
+        }
     }
     
     var deleteDir = UITableViewRowAnimation.right
@@ -177,12 +190,23 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
             }
             dones.append(item)
             if doneSectionExpanded {
-                DispatchQueue.main.asyncAfter(deadline: .now()+0.9) {
-                    self.tableView.insertRows(at: [IndexPath(row: self.dones.count-1, section: 1)], with: .fade)
-                    self.tableView.reloadData()
-                    self.swipeLocked = false
-                    self.tableView.isScrollEnabled = true
+                tableView.reloadData()
+                swipeLocked = false
+                self.tableView.isScrollEnabled = true
+                /*
+                let donePath = IndexPath(row: self.dones.count-1, section: 1)
+                if dones.count > 1 && cellVisible(path: <#T##IndexPath#>) {
+                    print("done cell visible animate")
+                    DispatchQueue.main.asyncAfter(deadline: .now()+0.9) {
+                        self.tableView.insertRows(at: [donePath], with: .fade)
+                        self.tableView.reloadData()
+                        self.swipeLocked = false
+                        self.tableView.isScrollEnabled = true
                 }
+                }else{
+                    print("done cell not visible")
+                 
+                }*/
             }
      
         }else{
@@ -245,8 +269,8 @@ self.swipeLocked = false
         
         if let size = (not.userInfo?[UIKeyboardFrameBeginUserInfoKey] as? NSValue)?.cgRectValue {
             print(size)
+            self.bottomViewHeight.constant = size.height + CGFloat(10)
             UIView.animate(withDuration: 0.33) {
-                self.optionsBarHeight.constant = size.height + CGFloat(10)
                 self.view.layoutIfNeeded()
             }
 
@@ -255,8 +279,8 @@ self.swipeLocked = false
     
     @objc func keyboardWillHide() {
         print("keyboard down")
+        self.bottomViewHeight.constant = 0
         UIView.animate(withDuration: 0.33) {
-            self.optionsBarHeight.constant = 0
              self.view.layoutIfNeeded()
         }
         
@@ -288,6 +312,17 @@ self.swipeLocked = false
     }
 
     // MARK: - Bottom bars
+    
+    
+    @IBOutlet weak var bottomViewHeight: NSLayoutConstraint!
+    @IBOutlet weak var dateBar: UIView!
+    @IBOutlet weak var itemBar: UIView!
+    @IBOutlet weak var colorBtn1: UIButton!
+    @IBOutlet weak var colorBtn2: UIButton!
+    @IBOutlet weak var colorBtn3: UIButton!
+    @IBOutlet weak var colorBtn4: UIButton!
+    @IBOutlet weak var colorBtn5: UIButton!
+    
     let colors = [UIColor(red: CGFloat(255.0/255.0), green: CGFloat(205.0/255.0), blue: CGFloat(195.0/255.0), alpha: 1.0),
                   UIColor(red: CGFloat(245.0/255.0), green: CGFloat(255.0/255.0), blue: CGFloat(210.0/255.0), alpha: 1.0),
                   UIColor(red: CGFloat(215.0/255.0), green: CGFloat(255.0/255.0), blue: CGFloat(215.0/255.0), alpha: 1.0),
@@ -295,11 +330,15 @@ self.swipeLocked = false
                   UIColor.white]
     @IBAction func colorSelected(_ sender: UIButton) {
         print(sender.tag)
+        bottomViewCounter = 10
         let cell = tableView.cellForRow(at: highlightedCell) as! TodoItemCell
-        cell.colorStripe.backgroundColor = colors[sender.tag-1]
+        cell.colorStripe.backgroundColor = colors[sender.tag-1
+        ]
     }
     
     @IBAction func todayPressed(_ sender: UIButton) {
+        bottomViewCounter = 10
+
         print("go to Today")
         let today = Date()
         print("list date \(currentListDate)")
@@ -320,6 +359,8 @@ self.swipeLocked = false
     }
     
     @IBAction func previousDayPressed(_ sender: UIButton) {
+        bottomViewCounter = 10
+
         deleteDir = .right
         insertDir = .left
       let previous = Calendar.current.date(byAdding: .day, value: -1, to: currentListDate)
@@ -328,6 +369,7 @@ self.swipeLocked = false
     }
     
     @IBAction func nextDayPressed(_ sender: UIButton) {
+        bottomViewCounter = 10
         deleteDir = .left
         insertDir = .right
         let next = Calendar.current.date(byAdding: .day, value: 1, to: currentListDate)
@@ -339,19 +381,82 @@ self.swipeLocked = false
     func showItemBar()
     {
         print("show item bar")
-            dateBar.isHidden = true
-            itemBar.isHidden = false
-        
+        dateBar.isHidden = true
+        itemBar.isHidden = false
     }
     
     func hideItemBar() {
         print("hide item bar")
         itemBar.isHidden = true
         dateBar.isHidden = false
-        dateBar.isUserInteractionEnabled = true
+    }
+    
+    func showDateBar() {
+        itemBar.isHidden = true
+        dateBar.isHidden = false
+    }
+    
+    func hideBottomView() {
+        print("hide bottom iew")
+        bottomViewHeight.constant = 0
+        UIView.animate(withDuration: 0.2) {
+            self.view.layoutIfNeeded()
+        }
+        showDateBar()
+    }
+    
+    func showBottomView() {
+        print("show bottom view")
+        bottomViewCounter = 10
+        bottomViewHeight.constant = 0.07 * view.bounds.height
+        UIView.animate(withDuration: 0.2) {
+            self.view.layoutIfNeeded()
+        }
+    }
+    /*
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+    //    print("scrolling, hide item bar")
+        hideItemBar()
+    }*/
+
+    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+        print("start scrolling... hide item bar")
+        if !itemBar.isHidden {
+            hideBottomView()
+
+        }
+    }
+    
+    /*
+    func scrollViewDidScrollToTop(_ scrollView: UIScrollView) {
+        print("scrolled to top, show date bar")
+        bottomViewCounter = 6
+        showBottomView()
+    }
+    
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        print(tableView.contentOffset)
+    }*/
+    
+    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+        print("finsiehd scrolling \(tableView.contentOffset)")
+        if tableView.contentOffset.y <= 0 {
+            print("scrolled to TOP")
+            showBottomView()
+        }
+    }
+    
+    func cellVisible(path: IndexPath) -> Bool {
+        print("check visibility of \(path)")
+        print(tableView.indexPathsForVisibleRows)
+        if tableView.indexPathsForVisibleRows!.contains(path) {
+            return true
+        }
+        return false
     }
     
     // MARK: - Table view
+    
     func numberOfSections(in tableView: UITableView) -> Int {
        return 2
     }
@@ -399,6 +504,7 @@ self.swipeLocked = false
         cell.section = indexPath.section
         cell.row = indexPath.row
         cell.textView.tag = indexPath.row
+        cell.indexPath = indexPath
         cell.textView.delegate = self
                 // --- TODOS -----
         if indexPath.section < 1 {
@@ -436,7 +542,9 @@ self.swipeLocked = false
                 cell.setTextBold()
                 print("select item \(todos[indexPath.row][0])")
                 highlightedCell = indexPath
+                bottomViewCounter = 5
                 showItemBar()
+                showBottomView()
             }
    
         }
