@@ -182,16 +182,21 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
     }
     
     var swipeLocked = false
-    func completeItem(section: Int, row: Int) {
+    func completeItem(ip: IndexPath ) {
         swipeLocked = true
         tableView.isScrollEnabled = false
         // complete from todo section
-        if section < 1 {
-            print("complete \(todos[row])")
-            let item = todos[row]
-            todos.remove(at: row)
+        if ip.section < 1 {
+            print("complete \(todos[ip.row])")
+            if let bold = highlightedCell {
+                if bold == ip {
+                    highlightedCell = nil
+                }
+            }
+            let item = todos[ip.row]
+            todos.remove(at: ip.row)
             UIView.animate(withDuration: 0.3) {
-                self.tableView.deleteRows(at: [IndexPath(row: row, section: section)], with: .right)
+                self.tableView.deleteRows(at: [ip], with: .right)
             }
             dones.append(item)
             if doneSectionExpanded {
@@ -216,10 +221,10 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
      
         }else{
         // reopen done item
-                print("reopen row \(row) \(dones.count)")
-                let item = dones[row]
-                dones.remove(at: row)
-            self.tableView.deleteRows(at: [IndexPath(row: row, section: section)], with: .right)
+                print("reopen row \(ip.row) \(dones.count)")
+                let item = dones[ip.row]
+                dones.remove(at: ip.row)
+            self.tableView.deleteRows(at: [ip], with: .right)
 /*
             UIView.animate(withDuration: 0.3) {
             }*/
@@ -548,12 +553,13 @@ self.swipeLocked = false
                 view.endEditing(true)
                 if let selected = highlightedCell {
                     if indexPath != selected {
-                        (tableView.cellForRow(at: selected) as! TodoItemCell).unhighlight()
+                        highlightedCell = indexPath
+                    }else{
+                        highlightedCell = nil
                     }
+                }else{
+                    highlightedCell = indexPath
                 }
-                print("current select \(highlightedCell)")
-                print("select item \(todos[indexPath.row][0])")
-                (tableView.cellForRow(at: indexPath) as! TodoItemCell).toggleBold()
                 bottomViewCounter = 5
                 showItemBar()
                 showBottomView()

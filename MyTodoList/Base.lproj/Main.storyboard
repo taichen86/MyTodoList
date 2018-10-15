@@ -150,8 +150,14 @@
                                                     <textInputTraits key="textInputTraits" autocapitalizationType="sentences" returnKeyType="done"/>
                                                 </textView>
                                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="92n-ut-R8f">
-                                                    <rect key="frame" x="172" y="6" width="30" height="30"/>
-                                                    <state key="normal" title="+"/>
+                                                    <rect key="frame" x="155" y="-11.5" width="65" height="65"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="width" secondItem="92n-ut-R8f" secondAttribute="height" multiplier="1:1" id="L9k-Pt-DjV"/>
+                                                        <constraint firstAttribute="height" constant="65" id="x2f-Sa-f8B"/>
+                                                    </constraints>
+                                                    <state key="normal" title="+">
+                                                        <color key="titleColor" red="0.26051741839999998" green="0.2605243921" blue="0.260520637" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                    </state>
                                                     <connections>
                                                         <action selector="addItemPressed:" destination="8ZX-6m-HWP" eventType="touchUpInside" id="8lc-nL-EPb"/>
                                                     </connections>
@@ -255,9 +261,12 @@
                                     <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Puu-VC-kRe" userLabel="Date Bar">
                                         <rect key="frame" x="0.0" y="0.5" width="375" height="50"/>
                                         <subviews>
-                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="4Ts-s9-Yv5">
-                                                <rect key="frame" x="20" y="10.5" width="30" height="30"/>
-                                                <state key="normal" title="&lt;-"/>
+                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="4Ts-s9-Yv5" userLabel="Previous">
+                                                <rect key="frame" x="20" y="6.5" width="38" height="38"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="width" secondItem="4Ts-s9-Yv5" secondAttribute="height" multiplier="1:1" id="7sc-fQ-ALs"/>
+                                                </constraints>
+                                                <state key="normal" image="left-arrow"/>
                                                 <connections>
                                                     <action selector="previousDayPressed:" destination="j8E-Ih-Wpi" eventType="touchUpInside" id="pef-kw-bFQ"/>
                                                 </connections>
@@ -269,9 +278,12 @@
                                                     <action selector="todayPressed:" destination="j8E-Ih-Wpi" eventType="touchUpInside" id="UHx-Mu-de1"/>
                                                 </connections>
                                             </button>
-                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="q56-zP-td0">
-                                                <rect key="frame" x="325" y="10.5" width="30" height="30"/>
-                                                <state key="normal" title="-&gt;"/>
+                                            <button opaque="NO" contentMode="scaleAspectFit" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="q56-zP-td0" userLabel="Next">
+                                                <rect key="frame" x="317" y="6.5" width="38" height="38"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="width" secondItem="q56-zP-td0" secondAttribute="height" multiplier="1:1" id="fT4-9l-kur"/>
+                                                </constraints>
+                                                <state key="normal" image="right-arrow"/>
                                                 <connections>
                                                     <action selector="nextDayPressed:" destination="j8E-Ih-Wpi" eventType="touchUpInside" id="2LS-S0-YLD"/>
                                                 </connections>
@@ -283,6 +295,8 @@
                                             <constraint firstItem="4Ts-s9-Yv5" firstAttribute="centerY" secondItem="Puu-VC-kRe" secondAttribute="centerY" id="Kyg-KC-MaC"/>
                                             <constraint firstItem="q56-zP-td0" firstAttribute="centerY" secondItem="Puu-VC-kRe" secondAttribute="centerY" id="TbO-VU-TxW"/>
                                             <constraint firstItem="4Ts-s9-Yv5" firstAttribute="leading" secondItem="Puu-VC-kRe" secondAttribute="leading" constant="20" id="UYu-Fb-7lh"/>
+                                            <constraint firstItem="q56-zP-td0" firstAttribute="height" secondItem="Puu-VC-kRe" secondAttribute="height" multiplier="0.76" id="Ve8-V4-ofI"/>
+                                            <constraint firstItem="4Ts-s9-Yv5" firstAttribute="height" secondItem="Puu-VC-kRe" secondAttribute="height" multiplier="0.76" id="erq-0l-8xv"/>
                                             <constraint firstItem="gTM-9V-uAr" firstAttribute="centerX" secondItem="Puu-VC-kRe" secondAttribute="centerX" id="njf-Pf-b0h"/>
                                             <constraint firstAttribute="trailing" secondItem="q56-zP-td0" secondAttribute="trailing" constant="20" id="pb7-FR-PEA"/>
                                         </constraints>
@@ -352,4 +366,8 @@
             <point key="canvasLocation" x="4325.6000000000004" y="115.59220389805098"/>
         </scene>
     </scenes>
+    <resources>
+        <image name="left-arrow" width="64" height="64"/>
+        <image name="right-arrow" width="64" height="64"/>
+    </resources>
 </document>

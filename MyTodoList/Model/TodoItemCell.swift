@@ -59,13 +59,13 @@ class TodoItemCell: UITableViewCell {
         isBold = true
     }*/
  
-    
+ /*
     func unhighlight() {
             textView.text = textView.attributedText.string
-            isBold = false
+     //       isBold = false
         print("unhighlight \(indexPath)")
 
-    }
+    }*/
     
     func setAsTodoCell() {
         addButton.isHidden = true
@@ -126,7 +126,7 @@ class TodoItemCell: UITableViewCell {
         UIView.animate(withDuration: 0.3) {
                     self.textView.attributedText = NSAttributedString(string: self.textView.text, attributes: self.strikedAttribute) // TODO: animate
         }
-        tableView?.completeItem(section: self.section, row: self.row)
+        tableView?.completeItem(ip: indexPath)
 
     }
     
@@ -135,7 +135,7 @@ class TodoItemCell: UITableViewCell {
         textView.isUserInteractionEnabled = true
         textView.becomeFirstResponder()
     }
-    
+    /*
     var isBold = false
     func toggleBold() {
         print("currently bold??? \(isBold)")
@@ -148,11 +148,11 @@ class TodoItemCell: UITableViewCell {
         }
         isBold = !isBold
         print("after toggle bold \(section) \(row) \(isBold)")
-    }
+    }*/
 
     func setBold() {
-        print("reset bold")
-        isBold = true
+   //     print("set bold")
+   //     isBold = true
         textView.attributedText = NSAttributedString(string: textView.text, attributes: boldAttributes)
     }
 
