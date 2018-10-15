@@ -22,7 +22,7 @@ extension ListViewController: UITextViewDelegate {
     func textViewDidBeginEditing(_ textView: UITextView) {
         print("------- did begin editing \(textView.tag)")
         tableView.isScrollEnabled = false
-        (textView.superview?.superview as! TodoItemCell).setAsTodoCell()
+    //    (textView.superview?.superview as! TodoItemCell).setAsTodoCell()
     }
  
     func textViewDidEndEditing(_ textView: UITextView) {
@@ -87,18 +87,22 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
         print("bottom view height \(bottomViewHeight.constant)")
         // show date
         dateFormatter.dateFormat = "dd.MM.yyyy"
+        
+        
         loadDataForDate(listDate: Date())
  
         bottomViewCounter = 5
         bottomViewTimer =  Timer.scheduledTimer(timeInterval: 1.1, target: self, selector: #selector(idleTimer), userInfo: nil, repeats: true)
        
+        
+        
     }
     
     
     @objc func idleTimer() {
         if bottomViewCounter > 0 {
             bottomViewCounter -= 1
-            print("bottom view counter \(bottomViewCounter)")
+   //         print("bottom view counter \(bottomViewCounter)")
             return
         }
         if bottomViewHeight.constant > 0 {
@@ -170,8 +174,9 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
 
     func addItem() {
         let cell = tableView.cellForRow(at: IndexPath(row: todos.count, section: 0)) as! TodoItemCell
-        cell.hideAddButton()
-        cell.setAsTodoCell()
+  //      cell.hideAddButton()
+ //       cell.setAsTodoCell()
+        cell.setAsAddItemCell()
         cell.textView.isUserInteractionEnabled = true
         cell.textView.becomeFirstResponder()
     }
@@ -332,13 +337,17 @@ self.swipeLocked = false
     @IBAction func colorSelected(_ sender: UIButton) {
         print(sender.tag)
         bottomViewCounter = 10
-        let cell = tableView.cellForRow(at: highlightedCell) as! TodoItemCell
+        guard let selected = highlightedCell else {
+            return
+        }
+        
+        let cell = tableView.cellForRow(at: selected) as! TodoItemCell
         cell.colorStripe.backgroundColor = colors[sender.tag-1]
         
-        if todos[highlightedCell.row].count == 1 {
-            todos[highlightedCell.row].append(sender.tag-1)
+        if todos[selected.row].count == 1 {
+            todos[selected.row].append(sender.tag-1)
         }else{
-            todos[highlightedCell.row][1] = sender.tag-1
+            todos[selected.row][1] = sender.tag-1
         }
         print(todos)
         saveList()
@@ -352,7 +361,6 @@ self.swipeLocked = false
         print("list date \(currentListDate)")
         print("today \(today)")
         if dateFormatter.string(from: currentListDate) == dateFormatter.string(from: today) {
-            print("equal")
             return
         }
         if currentListDate < today {
@@ -388,13 +396,11 @@ self.swipeLocked = false
     
     func showItemBar()
     {
-        print("show item bar")
         dateBar.isHidden = true
         itemBar.isHidden = false
     }
     
     func hideItemBar() {
-        print("hide item bar")
         itemBar.isHidden = true
         dateBar.isHidden = false
     }
@@ -405,7 +411,6 @@ self.swipeLocked = false
     }
     
     func hideBottomView() {
-        print("hide bottom iew")
         bottomViewHeight.constant = 0
         UIView.animate(withDuration: 0.2) {
             self.view.layoutIfNeeded()
@@ -414,42 +419,24 @@ self.swipeLocked = false
     }
     
     func showBottomView() {
-        print("show bottom view")
         bottomViewCounter = 10
         bottomViewHeight.constant = 0.07 * view.bounds.height
         UIView.animate(withDuration: 0.2) {
             self.view.layoutIfNeeded()
         }
     }
-    /*
-    func scrollViewDidScroll(_ scrollView: UIScrollView) {
-    //    print("scrolling, hide item bar")
-        hideItemBar()
-    }*/
 
     func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
-        print("start scrolling... hide item bar")
         if !itemBar.isHidden {
             hideBottomView()
 
         }
     }
     
-    /*
-    func scrollViewDidScrollToTop(_ scrollView: UIScrollView) {
-        print("scrolled to top, show date bar")
-        bottomViewCounter = 6
-        showBottomView()
-    }
-    
-    func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        print(tableView.contentOffset)
-    }*/
-    
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
-        print("finsiehd scrolling \(tableView.contentOffset)")
+ //       print("finsiehd scrolling \(tableView.contentOffset)")
         if tableView.contentOffset.y <= 0 {
-            print("scrolled to TOP")
+    //        print("scrolled to TOP")
             showBottomView()
         }
     }
@@ -468,7 +455,6 @@ self.swipeLocked = false
     func numberOfSections(in tableView: UITableView) -> Int {
        return 2
     }
-    
     
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         if section < 1 {
@@ -494,9 +480,7 @@ self.swipeLocked = false
         if section < 1 {
             return todos.count + 1
         }else{
-      //      return dones.count
             if doneSectionExpanded {
-          //      print("num of rows in section 1 \(dones.count)")
                 return dones.count
             }
             return 0
@@ -518,14 +502,20 @@ self.swipeLocked = false
                 // --- TODOS -----
         if indexPath.section < 1 {
             if indexPath.row < todos.count {
-                cell.hideAddButton()
+          //      cell.hideAddButton()
+                cell.setAsTodoCell()
+
                 cell.textView.text = todos[indexPath.row][0] as! String + "  row \(cell.row)"
                 if todos[indexPath.row].count > 1 {
                     cell.setColor(index: todos[indexPath.row][1] as! Int)
                 }
                 
+                if let bold = highlightedCell {
+                    if indexPath == bold {
+                        cell.setBold()
+                    }
+                }
                 
-                cell.setAsTodoCell()
                 cell.registerDoubleTap()
                 cell.registerSwipes()
             }else{
@@ -537,6 +527,7 @@ self.swipeLocked = false
             cell.textView.text = dones[indexPath.row][0] as! String + "  row \(cell.row)"
             cell.setAsDoneCell()
             cell.registerSwipes()
+            // TODO: deregister taps
             if dones[indexPath.row].count > 1 {
                 cell.setColor(index: dones[indexPath.row][1] as! Int)
             }
@@ -546,7 +537,7 @@ self.swipeLocked = false
     
     
     // --------   SELECT ROW ---------------
-    var highlightedCell = IndexPath(row: 0, section: 0)
+    var highlightedCell : IndexPath?
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         print("select row \(indexPath)")
         sectionBeingEdited = indexPath.section
@@ -555,16 +546,21 @@ self.swipeLocked = false
             // press on todo item
             if indexPath.row < todos.count {
                 view.endEditing(true)
-                let cell = tableView.cellForRow(at: IndexPath(row: indexPath.row, section: 0)) as! TodoItemCell
-                cell.setTextBold()
+                if let selected = highlightedCell {
+                    if indexPath != selected {
+                        (tableView.cellForRow(at: selected) as! TodoItemCell).unhighlight()
+                    }
+                }
+                print("current select \(highlightedCell)")
                 print("select item \(todos[indexPath.row][0])")
-                highlightedCell = indexPath
+                (tableView.cellForRow(at: indexPath) as! TodoItemCell).toggleBold()
                 bottomViewCounter = 5
                 showItemBar()
                 showBottomView()
             }
    
         }
+        tableView.reloadSections([0], with: .none)
     }
     
     

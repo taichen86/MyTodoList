@@ -53,8 +53,25 @@ class TodoItemCell: UITableViewCell {
         colorStripe.backgroundColor = tableView?.colors[index]
     }
     
+    /*
+    func highlight() {
+        textView.attributedText = NSAttributedString(string: textView.text, attributes: boldAttributes)
+        isBold = true
+    }*/
+ 
+    
+    func unhighlight() {
+            textView.text = textView.attributedText.string
+            isBold = false
+        print("unhighlight \(indexPath)")
+
+    }
+    
     func setAsTodoCell() {
+        addButton.isHidden = true
         textView.attributedText = NSAttributedString(string: textView.text, attributes: resetAttributes)
+        textView.attributedText = NSAttributedString(string: "")
+        textView.text = ""
     }
 
     func hideAddButton() {
@@ -69,6 +86,8 @@ class TodoItemCell: UITableViewCell {
     }
     
     func setAsAddItemCell() {
+        textView.attributedText = NSAttributedString(string: textView.text, attributes: resetAttributes)
+        textView.attributedText = NSAttributedString(string: "")
         textView.text = ""
         addButton.isHidden = false
     }
@@ -118,17 +137,25 @@ class TodoItemCell: UITableViewCell {
     }
     
     var isBold = false
-    func setTextBold() {
-        print("set bold \(section) \(row)")
+    func toggleBold() {
+        print("currently bold??? \(isBold)")
         if isBold {
             textView.text = textView.attributedText.string
+            tableView?.highlightedCell = nil
         }else{
             textView.attributedText = NSAttributedString(string: textView.text, attributes: boldAttributes)
+            tableView?.highlightedCell = indexPath
         }
         isBold = !isBold
+        print("after toggle bold \(section) \(row) \(isBold)")
     }
 
-    
+    func setBold() {
+        print("reset bold")
+        isBold = true
+        textView.attributedText = NSAttributedString(string: textView.text, attributes: boldAttributes)
+    }
+
     
     override func setSelected(_ selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)
