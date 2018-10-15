@@ -323,7 +323,8 @@ self.swipeLocked = false
     @IBOutlet weak var colorBtn4: UIButton!
     @IBOutlet weak var colorBtn5: UIButton!
     
-    let colors = [UIColor(red: CGFloat(255.0/255.0), green: CGFloat(205.0/255.0), blue: CGFloat(195.0/255.0), alpha: 1.0),
+    let colors = [
+                  UIColor(red: CGFloat(255.0/255.0), green: CGFloat(205.0/255.0), blue: CGFloat(195.0/255.0), alpha: 1.0),
                   UIColor(red: CGFloat(245.0/255.0), green: CGFloat(255.0/255.0), blue: CGFloat(210.0/255.0), alpha: 1.0),
                   UIColor(red: CGFloat(215.0/255.0), green: CGFloat(255.0/255.0), blue: CGFloat(215.0/255.0), alpha: 1.0),
                   UIColor(red: CGFloat(225.0/255.0), green: CGFloat(240.0/255.0), blue: CGFloat(255.0/255.0), alpha: 1.0),
@@ -332,8 +333,15 @@ self.swipeLocked = false
         print(sender.tag)
         bottomViewCounter = 10
         let cell = tableView.cellForRow(at: highlightedCell) as! TodoItemCell
-        cell.colorStripe.backgroundColor = colors[sender.tag-1
-        ]
+        cell.colorStripe.backgroundColor = colors[sender.tag-1]
+        
+        if todos[highlightedCell.row].count == 1 {
+            todos[highlightedCell.row].append(sender.tag-1)
+        }else{
+            todos[highlightedCell.row][1] = sender.tag-1
+        }
+        print(todos)
+        saveList()
     }
     
     @IBAction func todayPressed(_ sender: UIButton) {
@@ -497,7 +505,7 @@ self.swipeLocked = false
 
     // --------   DEQUEUE REUSABLE CELL ---------------
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-  //      print("cellForRowAt \(indexPath.section) row \(indexPath.row)")
+        print("cellForRowAt \(indexPath.section) row \(indexPath.row)")
         let cell = tableView.dequeueReusableCell(withIdentifier: "TodoItemCell", for: indexPath) as! TodoItemCell
         cell.textView.isUserInteractionEnabled = false
         cell.tableView = self
@@ -506,11 +514,17 @@ self.swipeLocked = false
         cell.textView.tag = indexPath.row
         cell.indexPath = indexPath
         cell.textView.delegate = self
+        cell.removeColor()
                 // --- TODOS -----
         if indexPath.section < 1 {
             if indexPath.row < todos.count {
                 cell.hideAddButton()
                 cell.textView.text = todos[indexPath.row][0] as! String + "  row \(cell.row)"
+                if todos[indexPath.row].count > 1 {
+                    cell.setColor(index: todos[indexPath.row][1] as! Int)
+                }
+                
+                
                 cell.setAsTodoCell()
                 cell.registerDoubleTap()
                 cell.registerSwipes()
@@ -523,6 +537,9 @@ self.swipeLocked = false
             cell.textView.text = dones[indexPath.row][0] as! String + "  row \(cell.row)"
             cell.setAsDoneCell()
             cell.registerSwipes()
+            if dones[indexPath.row].count > 1 {
+                cell.setColor(index: dones[indexPath.row][1] as! Int)
+            }
         }
         return cell
     }

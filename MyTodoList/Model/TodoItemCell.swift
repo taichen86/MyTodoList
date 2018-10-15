@@ -46,6 +46,13 @@ class TodoItemCell: UITableViewCell {
         tableView?.addItem()
     }
 
+    func removeColor() {
+        colorStripe.backgroundColor = nil
+    }
+    func setColor(index: Int) {
+        colorStripe.backgroundColor = tableView?.colors[index]
+    }
+    
     func setAsTodoCell() {
         textView.attributedText = NSAttributedString(string: textView.text, attributes: resetAttributes)
     }
