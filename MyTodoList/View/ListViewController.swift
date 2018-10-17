@@ -90,6 +90,19 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
         
         loadDataForDate(listDate: Date())
  
+        // first time user
+   //     userdefaults.removeObject(forKey: "firstTime")
+   //     print( userdefaults.object(forKey: "firstTime") )
+        
+        if userdefaults.object(forKey: "firstTime") == nil {
+            print("first time using app")
+            todos.append(["press + to add",0])
+            todos.append(["-> swipe right to complete",1])
+            todos.append(["<- swipe left to delete ",2])
+            todos.append(["double click to edit",3])
+            userdefaults.set(false, forKey: "firstTime")
+        }
+    
         bottomViewCounter = 5
         bottomViewTimer =  Timer.scheduledTimer(timeInterval: 1.1, target: self, selector: #selector(idleTimer), userInfo: nil, repeats: true)
        
