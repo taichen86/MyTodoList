@@ -7,8 +7,17 @@
 //
 
 import UIKit
+import CVCalendar
 
-extension ListViewController: UITextViewDelegate {
+extension ListViewController: UITextViewDelegate, CVCalendarViewDelegate, CVCalendarMenuViewDelegate {
+    func presentationMode() -> CalendarMode {
+        return .monthView
+    }
+    
+    func firstWeekday() -> Weekday {
+        return .monday
+    }
+    
     func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
         textView.sizeToFit()
         tableView.beginUpdates()
@@ -76,6 +85,7 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
         super.viewDidLoad()
         tableView.delegate = self
         tableView.dataSource = self
+        tableView.backgroundColor = colors[4]
        
         // TODO: disable textfields by default
   //      view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(viewTapped)))
@@ -83,35 +93,42 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: .UIKeyboardWillHide, object: nil)
         
         bottomViewHeight.constant = 0.07 * view.bounds.height
-        print("bottom view height \(bottomViewHeight.constant)")
+ //       print("bottom view height \(bottomViewHeight.constant)")
         // show date
         dateFormatter.dateFormat = "dd.MM.yyyy"
-        
+        calendarTitleFormatter.dateFormat = "MMMM yyyy"
         
         loadDataForDate(listDate: Date())
  
         // first time user
    //     userdefaults.removeObject(forKey: "firstTime")
-   //     print( userdefaults.object(forKey: "firstTime") )
+        print("lets see user defaults stuff")
+        print( userdefaults.object(forKey: "firstTime") )
         
         if userdefaults.object(forKey: "firstTime") == nil {
             print("first time using app")
-            todos.append(["press + to add",0])
             todos.append(["-> swipe right to complete",1])
+            
             todos.append(["<- swipe left to delete ",2])
             todos.append(["double click to edit",3])
+            todos.append(["press + to add",0])
             userdefaults.set(false, forKey: "firstTime")
+            print(userdefaults.object(forKey: "firstTime"))
         }
     
-        bottomViewCounter = 5
+        bottomViewCounter = 6
         bottomViewTimer =  Timer.scheduledTimer(timeInterval: 1.1, target: self, selector: #selector(idleTimer), userInfo: nil, repeats: true)
        
-        
+        calendarView.delegate = self
+        calendarMenu.delegate = self
         
     }
     
     
     @objc func idleTimer() {
+        if !calendarView.isHidden {
+            return
+        }
         if bottomViewCounter > 0 {
             bottomViewCounter -= 1
    //         print("bottom view counter \(bottomViewCounter)")
@@ -281,7 +298,6 @@ self.swipeLocked = false
     
     @objc func keyboardWillShow(not: NSNotification) {
         print("keyboard up")
-        
         if let size = (not.userInfo?[UIKeyboardFrameBeginUserInfoKey] as? NSValue)?.cgRectValue {
             print(size)
             self.bottomViewHeight.constant = size.height + CGFloat(10)
@@ -293,12 +309,11 @@ self.swipeLocked = false
     }
     
     @objc func keyboardWillHide() {
-        print("keyboard down")
+   //     print("keyboard down")
         self.bottomViewHeight.constant = 0
         UIView.animate(withDuration: 0.33) {
              self.view.layoutIfNeeded()
         }
-        
     }
 
     func addAddButtonCell() {
@@ -326,9 +341,8 @@ self.swipeLocked = false
         tableView.reloadData()
     }
 
-    // MARK: - Bottom bars
-    
-    
+    // -------- BOTTOM BAR ---------------
+
     @IBOutlet weak var bottomViewHeight: NSLayoutConstraint!
     @IBOutlet weak var dateBar: UIView!
     @IBOutlet weak var itemBar: UIView!
@@ -343,7 +357,7 @@ self.swipeLocked = false
                   UIColor(red: CGFloat(245.0/255.0), green: CGFloat(255.0/255.0), blue: CGFloat(165.0/255.0), alpha: 1.0),
                   UIColor(red: CGFloat(175.0/255.0), green: CGFloat(255.0/255.0), blue: CGFloat(200.0/255.0), alpha: 1.0),
                   UIColor(red: CGFloat(165.0/255.0), green: CGFloat(210.0/255.0), blue: CGFloat(255.0/255.0), alpha: 1.0),
-                  UIColor.white]
+                  UIColor(red: 250.0/255.0, green: 250.0/255.0, blue: 240.0/255.0, alpha: 1.0)]
     @IBAction func colorSelected(_ sender: UIButton) {
         print(sender.tag)
         bottomViewCounter = 10
@@ -363,9 +377,42 @@ self.swipeLocked = false
         saveList()
     }
     
+
+    @IBOutlet weak var calendarTitle: UILabel!
+    @IBOutlet weak var calendarMenu: CVCalendarMenuView!
+    @IBOutlet weak var calendarView: CVCalendarView!
+    @IBOutlet weak var calendarButton: UIButton!
+    @IBAction func calendarPressed(_ sender: UIButton) {
+        print( "calendar pressed" )
+        if calendarView.isHidden {
+            calendarTitle.text = calendarTitleFormatter.string(from: Date())
+            calendarMenu.commitMenuViewUpdate()
+            calendarView.commitCalendarViewUpdate()
+            showCalendar(false)
+        }else{
+            showCalendar(true)
+        }
+    }
+
+    func showCalendar( _ stat: Bool){
+        calendarView.isHidden = stat
+        calendarMenu.isHidden = stat
+        calendarTitle.isHidden = stat
+    }
+    
+    
+    let calendarTitleFormatter  = DateFormatter()
+    func presentedDateUpdated(_ date: CVDate) {
+        if let date = date.convertedDate() {
+            print(date)
+            calendarTitle.text = calendarTitleFormatter.string(from: date)
+            loadDataForDate(listDate: date)
+        }
+    }
+    
+    
     @IBAction func todayPressed(_ sender: UIButton) {
         bottomViewCounter = 10
-
         print("go to Today")
         let today = Date()
         print("list date \(currentListDate)")
@@ -463,7 +510,7 @@ self.swipeLocked = false
         }else{
             let button = UIButton(type: .system)
             button.setTitleColor(UIColor.darkGray, for: .normal)
-            button.backgroundColor = UIColor(red: 250.0/255.0, green: 250.0/255.0, blue: 250.0/255.0, alpha: 1.0)
+            button.backgroundColor = colors[4]
 
             if dones.count < 1 {
                 button.setTitle("...", for: .normal)

@@ -20,7 +20,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   //     UserDefaults.standard.synchronize()
         let path = NSSearchPathForDirectoriesInDomains(.libraryDirectory, .userDomainMask, true)
         print("path \(path[0])")
-        let filepath = "\(path[0])/Preferences/com.TPBSoftware.MyTodoList.plist"
+        let filepath = "\(path[0])/Preferences/com.TPBSoftware.DailyTodoList.plist"
         let size = try? FileManager.default.attributesOfItem(atPath: filepath)
         print(size?[FileAttributeKey.size])
     
