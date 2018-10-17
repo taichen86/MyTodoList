@@ -22,7 +22,6 @@ extension ListViewController: UITextViewDelegate {
     func textViewDidBeginEditing(_ textView: UITextView) {
         print("------- did begin editing \(textView.tag)")
         tableView.isScrollEnabled = false
-    //    (textView.superview?.superview as! TodoItemCell).setAsTodoCell()
     }
  
     func textViewDidEndEditing(_ textView: UITextView) {
@@ -33,7 +32,7 @@ extension ListViewController: UITextViewDelegate {
         print("edit existing \(textView.tag)")
             todos[textView.tag][0] = textView.text!
             if textView.text.isEmpty {
-                deleteItem(section: sectionBeingEdited, row: itemBeingEdited)
+                deleteItem( ip: (textView.superview?.superview as! TodoItemCell).indexPath )
             }
         }else{
             var todo : [Any] = [""]
@@ -172,15 +171,6 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
 
     }
 
-    func addItem() {
-        let cell = tableView.cellForRow(at: IndexPath(row: todos.count, section: 0)) as! TodoItemCell
-  //      cell.hideAddButton()
- //       cell.setAsTodoCell()
-        cell.setAsAddItemCell()
-        cell.textView.isUserInteractionEnabled = true
-        cell.textView.becomeFirstResponder()
-    }
-    
     var swipeLocked = false
     func completeItem(ip: IndexPath ) {
         swipeLocked = true
@@ -249,19 +239,21 @@ self.swipeLocked = false
         saveList()
     }
     
-    func deleteItem(section: Int, row: Int) {
-        print("delete item \(section) \(row)")
+    func deleteItem(ip: IndexPath) {
+        print("delete item \(ip.section) \(ip.row)")
         swipeLocked = true
-        if section < 1 {
-            todos.remove(at: row)
+        tableView.isScrollEnabled = false
+        if ip.section < 1 {
+            todos.remove(at: ip.row)
         }else{
-            dones.remove(at: row)
+            dones.remove(at: ip.row)
         }
         UIView.animate(withDuration: 0.3) {
-            self.tableView.deleteRows(at: [IndexPath(row: row, section: section)], with: .left) }
+            self.tableView.deleteRows(at: [ip], with: .left) }
         saveList()
         tableView.reloadData()
         swipeLocked = false
+        tableView.isScrollEnabled = true
     }
     
     func saveList() {
@@ -301,6 +293,7 @@ self.swipeLocked = false
     }
     
     @objc func doneSectionPressed() {
+        print("done section pressed \(dones.count)")
         if dones.count == 0 {
             print("no dones!")
             return
@@ -314,11 +307,10 @@ self.swipeLocked = false
         doneSectionExpanded = !doneSectionExpanded
         if doneSectionExpanded {
             tableView.insertRows(at: paths, with: .automatic)
-
         }else{
             tableView.deleteRows(at: paths, with: .fade)
         }
-   //     refreshTableView()
+        tableView.reloadData()
     }
 
     // MARK: - Bottom bars
@@ -334,10 +326,10 @@ self.swipeLocked = false
     @IBOutlet weak var colorBtn5: UIButton!
     
     let colors = [
-                  UIColor(red: CGFloat(255.0/255.0), green: CGFloat(205.0/255.0), blue: CGFloat(195.0/255.0), alpha: 1.0),
-                  UIColor(red: CGFloat(245.0/255.0), green: CGFloat(255.0/255.0), blue: CGFloat(210.0/255.0), alpha: 1.0),
-                  UIColor(red: CGFloat(215.0/255.0), green: CGFloat(255.0/255.0), blue: CGFloat(215.0/255.0), alpha: 1.0),
-                  UIColor(red: CGFloat(225.0/255.0), green: CGFloat(240.0/255.0), blue: CGFloat(255.0/255.0), alpha: 1.0),
+                  UIColor(red: CGFloat(255.0/255.0), green: CGFloat(140.0/255.0), blue: CGFloat(125.0/255.0), alpha: 1.0),
+                  UIColor(red: CGFloat(245.0/255.0), green: CGFloat(255.0/255.0), blue: CGFloat(165.0/255.0), alpha: 1.0),
+                  UIColor(red: CGFloat(175.0/255.0), green: CGFloat(255.0/255.0), blue: CGFloat(200.0/255.0), alpha: 1.0),
+                  UIColor(red: CGFloat(165.0/255.0), green: CGFloat(210.0/255.0), blue: CGFloat(255.0/255.0), alpha: 1.0),
                   UIColor.white]
     @IBAction func colorSelected(_ sender: UIButton) {
         print(sender.tag)
@@ -421,6 +413,7 @@ self.swipeLocked = false
             self.view.layoutIfNeeded()
         }
         showDateBar()
+
     }
     
     func showBottomView() {
@@ -439,21 +432,11 @@ self.swipeLocked = false
     }
     
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
- //       print("finsiehd scrolling \(tableView.contentOffset)")
         if tableView.contentOffset.y <= 0 {
-    //        print("scrolled to TOP")
             showBottomView()
         }
     }
     
-    func cellVisible(path: IndexPath) -> Bool {
-        print("check visibility of \(path)")
-        print(tableView.indexPathsForVisibleRows)
-        if tableView.indexPathsForVisibleRows!.contains(path) {
-            return true
-        }
-        return false
-    }
     
     // MARK: - Table view
     
@@ -466,7 +449,15 @@ self.swipeLocked = false
             return nil
         }else{
             let button = UIButton(type: .system)
-            if self.doneSectionExpanded {
+            button.setTitleColor(UIColor.darkGray, for: .normal)
+            button.backgroundColor = UIColor(red: 250.0/255.0, green: 250.0/255.0, blue: 250.0/255.0, alpha: 1.0)
+
+            if dones.count < 1 {
+                button.setTitle("...", for: .normal)
+                return button
+            }
+            print("expanded \(doneSectionExpanded)")
+            if doneSectionExpanded {
                 button.setTitle("completed...", for: .normal)
             }else{
                 button.setTitle("...", for: .normal)
@@ -477,9 +468,6 @@ self.swipeLocked = false
     }
     
     // --------   NUMBER OF ROWS IN SECTION ---------------
-    var cellHeight = CGFloat(44.0)
-    var numOfTodoRows = 0
-    var numOfDoneRows = 0
     var doneSectionExpanded = true
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if section < 1 {
@@ -494,23 +482,22 @@ self.swipeLocked = false
 
     // --------   DEQUEUE REUSABLE CELL ---------------
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        print("cellForRowAt \(indexPath.section) row \(indexPath.row)")
+  //      print("cellForRowAt \(indexPath.section) row \(indexPath.row)")
         let cell = tableView.dequeueReusableCell(withIdentifier: "TodoItemCell", for: indexPath) as! TodoItemCell
         cell.textView.isUserInteractionEnabled = false
         cell.tableView = self
-        cell.section = indexPath.section
-        cell.row = indexPath.row
-        cell.textView.tag = indexPath.row
         cell.indexPath = indexPath
+        cell.textView.tag = indexPath.row
         cell.textView.delegate = self
         cell.removeColor()
+        
                 // --- TODOS -----
         if indexPath.section < 1 {
             if indexPath.row < todos.count {
           //      cell.hideAddButton()
                 cell.setAsTodoCell()
 
-                cell.textView.text = todos[indexPath.row][0] as! String + "  row \(cell.row)"
+                cell.textView.text = todos[indexPath.row][0] as! String + "  row \(cell.indexPath.row)"
                 if todos[indexPath.row].count > 1 {
                     cell.setColor(index: todos[indexPath.row][1] as! Int)
                 }
@@ -521,18 +508,19 @@ self.swipeLocked = false
                     }
                 }
                 
-                cell.registerDoubleTap()
+                cell.registerTaps()
                 cell.registerSwipes()
+                
             }else{
-          //      print("setAsAddItemCell")
                 cell.setAsAddItemCell()
             }
         }else{
         // --- DONES -----
-            cell.textView.text = dones[indexPath.row][0] as! String + "  row \(cell.row)"
+            cell.textView.text = dones[indexPath.row][0] as! String + "  row \(cell.indexPath.row)"
             cell.setAsDoneCell()
             cell.registerSwipes()
             // TODO: deregister taps
+        //    cell.removeTapGestures()
             if dones[indexPath.row].count > 1 {
                 cell.setColor(index: dones[indexPath.row][1] as! Int)
             }
@@ -543,28 +531,27 @@ self.swipeLocked = false
     
     // --------   SELECT ROW ---------------
     var highlightedCell : IndexPath?
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        print("select row \(indexPath)")
-        sectionBeingEdited = indexPath.section
-        itemBeingEdited = indexPath.row
-        if indexPath.section < 1 {
-            // press on todo item
-            if indexPath.row < todos.count {
-                view.endEditing(true)
-                if let selected = highlightedCell {
-                    if indexPath != selected {
-                        highlightedCell = indexPath
-                    }else{
-                        highlightedCell = nil
-                    }
-                }else{
-                    highlightedCell = indexPath
-                }
+    func selectRow(ip: IndexPath) {
+        if ip.section > 0 { return }
+        if ip.row >= todos.count { return }
+        // press on todo item
+        view.endEditing(true)
+        if let selected = highlightedCell {
+            if ip != selected {
+                highlightedCell = ip
                 bottomViewCounter = 5
                 showItemBar()
                 showBottomView()
+            }else{
+                highlightedCell = nil
+                bottomViewCounter = 0
+                hideBottomView()
             }
-   
+        }else{
+            highlightedCell = ip
+            bottomViewCounter = 5
+            showItemBar()
+            showBottomView()
         }
         tableView.reloadSections([0], with: .none)
     }
@@ -573,48 +560,6 @@ self.swipeLocked = false
 
  
 
-    /*
-    // Override to support conditional editing of the table view.
-    override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the specified item to be editable.
-        return true
-    }*/
 
-    /*
-    // Override to support editing the table view.
-    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
-        if editingStyle == .delete {
-            // Delete the row from the data source
-            tableView.deleteRows(at: [indexPath], with: .fade)
-        } else if editingStyle == .insert {
-            // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-        }    
-    }
-    */
-
-    /*
-    // Override to support rearranging the table view.
-    override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
-
-    }
-    */
-
-    /*
-    // Override to support conditional rearranging of the table view.
-    override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the item to be re-orderable.
-        return true
-    }
-    */
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
-    }
-    */
 
 }

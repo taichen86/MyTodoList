@@ -42,8 +42,12 @@ class TodoItemCell: UITableViewCell {
     
     @IBOutlet weak var addButton: UIButton!
     @IBAction func addItemPressed(_ sender: UIButton) {
-        print("ADD Item")
-        tableView?.addItem()
+        addButton.isHidden = true
+        textView.text = ""
+   //     tableView?.addItem()
+    //    setAsAddItemCell()
+        textView.isUserInteractionEnabled = true
+        textView.becomeFirstResponder()
     }
 
     func removeColor() {
@@ -53,19 +57,6 @@ class TodoItemCell: UITableViewCell {
         colorStripe.backgroundColor = tableView?.colors[index]
     }
     
-    /*
-    func highlight() {
-        textView.attributedText = NSAttributedString(string: textView.text, attributes: boldAttributes)
-        isBold = true
-    }*/
- 
- /*
-    func unhighlight() {
-            textView.text = textView.attributedText.string
-     //       isBold = false
-        print("unhighlight \(indexPath)")
-
-    }*/
     
     func setAsTodoCell() {
         addButton.isHidden = true
@@ -101,11 +92,35 @@ class TodoItemCell: UITableViewCell {
         contentView.addGestureRecognizer(swipeRight)
     }
     
-    func registerDoubleTap() {
-        let doubleTap = UITapGestureRecognizer(target: self, action: #selector(doubleTapped))
+
+    var singleTap = UITapGestureRecognizer()
+    var doubleTap = UITapGestureRecognizer()
+    
+    func registerTaps() {
+        singleTap = UITapGestureRecognizer(target: self, action: #selector(singleTapped))
+        doubleTap = UITapGestureRecognizer(target: self, action: #selector(doubleTapped))
         doubleTap.numberOfTapsRequired = 2
         contentView.addGestureRecognizer(doubleTap)
         
+        singleTap.numberOfTapsRequired = 1
+        singleTap.require(toFail: doubleTap)
+        contentView.addGestureRecognizer(singleTap)
+        
+    }
+    
+    func removeGestures() {
+        if let gestures = contentView.gestureRecognizers {
+            for gesture in gestures {
+                print("remove \(gesture)")
+                contentView.removeGestureRecognizer(gesture)
+            }
+        }
+        
+    }
+    
+    func removeTapGestures() {
+        contentView.removeGestureRecognizer(singleTap)
+        contentView.removeGestureRecognizer(doubleTap)
     }
     
     @objc func swipedLeft () {
@@ -114,7 +129,7 @@ class TodoItemCell: UITableViewCell {
             print("locked")
             return
         }
-        tableView?.deleteItem(section: section, row: row)
+        tableView?.deleteItem(ip: indexPath)
     }
 
     @objc func swipedRight () {
@@ -128,6 +143,11 @@ class TodoItemCell: UITableViewCell {
         }
         tableView?.completeItem(ip: indexPath)
 
+    }
+    
+    @objc func singleTapped () {
+        print("single Tapped \(section) \(row)")
+        tableView?.selectRow(ip: indexPath)
     }
     
     @objc func doubleTapped () {
