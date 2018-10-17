@@ -72,6 +72,7 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
     
     var currentListDate = Date()
     var list = "Daily"
+    let dayFormatter = DateFormatter()
     let dateFormatter = DateFormatter()
     let userdefaults = UserDefaults.standard
     var listKey = "list" // Daily 01.12.2018, Weekly 01.12.2018, Monthly 10.2018
@@ -97,6 +98,8 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
         // show date
         dateFormatter.dateFormat = "dd.MM.yyyy"
         calendarTitleFormatter.dateFormat = "MMMM yyyy"
+        dayFormatter.dateFormat = "EEEE"
+        
         
         loadDataForDate(listDate: Date())
  
@@ -144,37 +147,40 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
     func loadDataForDate(listDate: Date) {
         print("load data for \(listDate)")
         currentListDate = listDate
-        let title = dateFormatter.string(from: listDate)
-        navigationItem.title = title
-        listKey = "\(title)"
+        let key = dateFormatter.string(from: currentListDate)
+        listKey = "\(key)"
+        print("list key \(listKey)")
+        let titleFormatter = DateFormatter()
+        titleFormatter.dateFormat = "EEEE MMM d, yyyy"
+        navigationItem.title = titleFormatter.string(from: listDate)
         
         // clear current list
         let todorows = todos.count
-        print("current list todos count \(todorows)")
+ //       print("current list todos count \(todorows)")
         todos.removeAll()
         var todopaths = [IndexPath]()
         for i in 0..<todorows {
             todopaths.append(IndexPath(row: i, section: 0))
         }
-        print("delete current list todos")
+  //      print("delete current list todos")
         tableView.deleteRows(at: todopaths, with: deleteDir)
         
         
         let donerows = dones.count
-        print("current list dones count \(donerows)")
+  //      print("current list dones count \(donerows)")
         dones.removeAll()
         var donepaths = [IndexPath]()
         for i in 0..<donerows {
             donepaths.append(IndexPath(row: i, section: 1))
         }
-        print("delete current list dones")
+ //       print("delete current list dones")
         if doneSectionExpanded {
             tableView.deleteRows(at: donepaths, with: deleteDir)
         }
 
         // load new list todos
         if let content = userdefaults.array(forKey: "\(listKey)A") {
-            print("existing date for todos)")
+     //       print("existing date for todos)")
             todos = content as! [[Any]]
             print(todos)
         }
@@ -187,7 +193,7 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
 
         // load new list dones
         if let content = userdefaults.array(forKey: "\(listKey)B") {
-            print("existing data for dones")
+      //      print("existing data for dones")
             dones = content as! [[Any]]
             print(dones)
         }
@@ -385,7 +391,7 @@ self.swipeLocked = false
     @IBAction func calendarPressed(_ sender: UIButton) {
         print( "calendar pressed" )
         if calendarView.isHidden {
-            calendarTitle.text = calendarTitleFormatter.string(from: Date())
+            calendarTitle.text = "\n" + calendarTitleFormatter.string(from: Date())
             calendarMenu.commitMenuViewUpdate()
             calendarView.commitCalendarViewUpdate()
             showCalendar(false)
@@ -405,7 +411,7 @@ self.swipeLocked = false
     func presentedDateUpdated(_ date: CVDate) {
         if let date = date.convertedDate() {
             print(date)
-            calendarTitle.text = calendarTitleFormatter.string(from: date)
+            calendarTitle.text = "\n" + calendarTitleFormatter.string(from: date)
             loadDataForDate(listDate: date)
         }
     }
@@ -557,7 +563,7 @@ self.swipeLocked = false
           //      cell.hideAddButton()
                 cell.setAsTodoCell()
 
-                cell.textView.text = todos[indexPath.row][0] as! String + "  row \(cell.indexPath.row)"
+                cell.textView.text = todos[indexPath.row][0] as! String /*+ "  row \(cell.indexPath.row)"*/
                 if todos[indexPath.row].count > 1 {
                     cell.setColor(index: todos[indexPath.row][1] as! Int)
                 }
