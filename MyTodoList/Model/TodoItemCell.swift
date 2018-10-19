@@ -81,8 +81,13 @@ class TodoItemCell: UITableViewCell {
         textView.attributedText = NSAttributedString(string: "")
         textView.text = ""
         addButton.isHidden = false
+        /*
+        let longPress = UILongPressGestureRecognizer(target: self, action: #selector(longTapped))
+        addButton.addGestureRecognizer(longPress)
+ */
     }
     
+ 
     func registerSwipes() {
         let swipeLeft = UISwipeGestureRecognizer(target: self, action: #selector(swipedLeft))
         swipeLeft.direction = .left
@@ -111,7 +116,7 @@ class TodoItemCell: UITableViewCell {
     func removeGestures() {
         if let gestures = contentView.gestureRecognizers {
             for gesture in gestures {
-                print("remove \(gesture)")
+           //     print("remove \(gesture)")
                 contentView.removeGestureRecognizer(gesture)
             }
         }
@@ -124,18 +129,18 @@ class TodoItemCell: UITableViewCell {
     }
     
     @objc func swipedLeft () {
-        print("swiped left \(section) \(row)")
+    //    print("swiped left \(section) \(row)")
         if tableView!.swipeLocked {
-            print("locked")
+     //       print("locked")
             return
         }
         tableView?.deleteItem(ip: indexPath)
     }
 
     @objc func swipedRight () {
-        print("swiped right \(section) \(row)")
+   //     print("swiped right \(section) \(row)")
         if tableView!.swipeLocked {
-            print("locked")
+   //         print("locked")
             return
         }
         UIView.animate(withDuration: 0.3) {
@@ -146,12 +151,12 @@ class TodoItemCell: UITableViewCell {
     }
     
     @objc func singleTapped () {
-        print("single Tapped \(section) \(row)")
+  //      print("single Tapped \(section) \(row)")
         tableView?.selectRow(ip: indexPath)
     }
     
     @objc func doubleTapped () {
-        print("dobule Tapped \(section) \(row)")
+ //       print("dobule Tapped \(section) \(row)")
         textView.isUserInteractionEnabled = true
         textView.becomeFirstResponder()
     }

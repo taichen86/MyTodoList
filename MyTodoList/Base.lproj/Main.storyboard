@@ -7,7 +7,6 @@
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14088"/>
         <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
-        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
         <capability name="Constraints with non-1.0 multipliers" minToolsVersion="5.1"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -267,7 +266,7 @@
                         <barButtonItem key="rightBarButtonItem" title="Item" image="settings" style="plain" id="6E7-jz-tTg">
                             <color key="tintColor" red="0.37055522200000002" green="0.37056469920000001" blue="0.37055957319999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <connections>
-                                <segue destination="dBv-g0-oIF" kind="show" identifier="goToSettings" id="RmE-FK-n0K"/>
+                                <segue destination="Ae2-aQ-2sv" kind="show" identifier="goToSettings" id="mUU-4u-aWJ"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>
@@ -292,58 +291,92 @@
             <point key="canvasLocation" x="5264.8000000000002" y="115.59220389805098"/>
         </scene>
         <!--Settings View View Controller-->
-        <scene sceneID="8br-ig-VLF">
+        <scene sceneID="jQN-06-Ucn">
             <objects>
-                <viewController id="dBv-g0-oIF" customClass="SettingsViewViewController" customModule="MyTodoList" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" contentMode="scaleToFill" id="HG6-Qh-j80">
+                <tableViewController id="Ae2-aQ-2sv" customClass="SettingsViewViewController" customModule="MyTodoList" customModuleProvider="target" sceneMemberID="viewController">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="static" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="caF-3c-cD3">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <subviews>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="aVQ-t4-jpf" userLabel="Upgrade">
-                                <rect key="frame" x="26" y="94" width="323" height="66.5"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="22"/>
-                                <state key="normal" title="upgrade $0.99">
-                                    <color key="titleColor" red="0.26051741839999998" green="0.2605243921" blue="0.260520637" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                </state>
-                                <connections>
-                                    <action selector="upgradeButtonPressed:" destination="dBv-g0-oIF" eventType="touchUpInside" id="xp5-gC-TQA"/>
-                                </connections>
-                            </button>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ZYU-3p-2gW" userLabel="Restore">
-                                <rect key="frame" x="26" y="170.5" width="323" height="66.5"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="22"/>
-                                <state key="normal" title="restore purchase">
-                                    <color key="titleColor" red="0.26051741839999998" green="0.2605243921" blue="0.260520637" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                </state>
-                                <connections>
-                                    <action selector="restoreButtonPressed:" destination="dBv-g0-oIF" eventType="touchUpInside" id="oDh-QG-AD8"/>
-                                    <action selector="upgradeButtonPressed:" destination="dBv-g0-oIF" eventType="touchUpInside" id="2iN-Nw-WB8"/>
-                                </connections>
-                            </button>
-                        </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                        <constraints>
-                            <constraint firstItem="aVQ-t4-jpf" firstAttribute="top" secondItem="HG6-Qh-j80" secondAttribute="topMargin" constant="30" id="3bE-ls-4ev"/>
-                            <constraint firstAttribute="trailingMargin" secondItem="ZYU-3p-2gW" secondAttribute="trailing" constant="10" id="4MA-ME-P3F"/>
-                            <constraint firstAttribute="trailingMargin" secondItem="aVQ-t4-jpf" secondAttribute="trailing" constant="10" id="B7s-yQ-MrH"/>
-                            <constraint firstItem="ZYU-3p-2gW" firstAttribute="top" secondItem="aVQ-t4-jpf" secondAttribute="bottom" constant="10" id="O5K-7O-n1x"/>
-                            <constraint firstItem="ZYU-3p-2gW" firstAttribute="leading" secondItem="HG6-Qh-j80" secondAttribute="leadingMargin" constant="10" id="P4l-5z-RaH"/>
-                            <constraint firstItem="ZYU-3p-2gW" firstAttribute="height" secondItem="aVQ-t4-jpf" secondAttribute="height" id="Wcv-sZ-hYD"/>
-                            <constraint firstItem="aVQ-t4-jpf" firstAttribute="leading" secondItem="HG6-Qh-j80" secondAttribute="leadingMargin" constant="10" id="oNB-6A-H2h"/>
-                            <constraint firstItem="aVQ-t4-jpf" firstAttribute="height" secondItem="HG6-Qh-j80" secondAttribute="height" multiplier="0.1" id="pGP-Yx-vBx"/>
-                        </constraints>
-                        <viewLayoutGuide key="safeArea" id="ykN-Rh-R7G"/>
-                    </view>
-                    <toolbarItems/>
-                    <simulatedToolbarMetrics key="simulatedBottomBarMetrics"/>
+                        <color key="sectionIndexBackgroundColor" red="0.98039215686274506" green="0.98039215686274506" blue="0.94117647058823528" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <view key="tableFooterView" contentMode="scaleToFill" id="EoJ-LP-w94" userLabel="footer">
+                            <rect key="frame" x="0.0" y="116" width="375" height="488"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <color key="backgroundColor" red="0.98039215686274506" green="0.98039215686274506" blue="0.94117647058823528" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        </view>
+                        <sections>
+                            <tableViewSection headerTitle="in app purchase" id="dUV-Iv-btq">
+                                <cells>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" id="dNO-Jm-FMz">
+                                        <rect key="frame" x="0.0" y="28" width="375" height="44"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="dNO-Jm-FMz" id="yXZ-v7-fb5">
+                                            <rect key="frame" x="0.0" y="0.0" width="375" height="43.5"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="leading" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="IWL-gP-NsT" userLabel="Upgrade">
+                                                    <rect key="frame" x="18" y="20" width="337" height="3.5"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="20"/>
+                                                    <state key="normal" title="upgrade">
+                                                        <color key="titleColor" red="0.26051741839999998" green="0.2605243921" blue="0.260520637" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                    </state>
+                                                    <connections>
+                                                        <action selector="upgradeButtonPressed:" destination="Ae2-aQ-2sv" eventType="touchUpInside" id="ME2-e5-FVS"/>
+                                                    </connections>
+                                                </button>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstItem="IWL-gP-NsT" firstAttribute="leading" secondItem="yXZ-v7-fb5" secondAttribute="leading" constant="18" id="0OI-Rh-aRg"/>
+                                                <constraint firstItem="IWL-gP-NsT" firstAttribute="top" secondItem="yXZ-v7-fb5" secondAttribute="top" constant="20" id="2Gv-Qq-YHv"/>
+                                                <constraint firstAttribute="trailing" secondItem="IWL-gP-NsT" secondAttribute="trailing" constant="20" id="DqK-G1-ehz"/>
+                                                <constraint firstAttribute="bottom" secondItem="IWL-gP-NsT" secondAttribute="bottom" constant="20" id="Pnc-ul-VGr"/>
+                                            </constraints>
+                                        </tableViewCellContentView>
+                                        <color key="backgroundColor" red="0.98039215686274506" green="0.98039215686274506" blue="0.94117647058823528" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                    </tableViewCell>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" id="DdO-CY-Gbi">
+                                        <rect key="frame" x="0.0" y="72" width="375" height="44"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="DdO-CY-Gbi" id="VYo-8L-Fgz">
+                                            <rect key="frame" x="0.0" y="0.0" width="375" height="43.5"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="leading" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="iM6-hu-pt1" userLabel="Restore">
+                                                    <rect key="frame" x="18" y="10" width="337" height="13.5"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="20"/>
+                                                    <state key="normal" title="restore purchase">
+                                                        <color key="titleColor" red="0.26051741839999998" green="0.2605243921" blue="0.260520637" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                    </state>
+                                                    <connections>
+                                                        <action selector="restoreButtonPressed:" destination="Ae2-aQ-2sv" eventType="touchUpInside" id="ne8-Dj-l82"/>
+                                                    </connections>
+                                                </button>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstItem="iM6-hu-pt1" firstAttribute="top" secondItem="VYo-8L-Fgz" secondAttribute="top" constant="10" id="Bmr-Al-yTG"/>
+                                                <constraint firstAttribute="trailing" secondItem="iM6-hu-pt1" secondAttribute="trailing" constant="20" id="LLv-je-5fi"/>
+                                                <constraint firstItem="iM6-hu-pt1" firstAttribute="leading" secondItem="VYo-8L-Fgz" secondAttribute="leading" constant="18" id="aRb-pl-I8u"/>
+                                                <constraint firstAttribute="bottom" secondItem="iM6-hu-pt1" secondAttribute="bottom" constant="20" id="tDl-4l-aWh"/>
+                                            </constraints>
+                                        </tableViewCellContentView>
+                                        <color key="backgroundColor" red="0.98039215686274506" green="0.98039215686274506" blue="0.94117647058823528" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                    </tableViewCell>
+                                </cells>
+                            </tableViewSection>
+                        </sections>
+                        <connections>
+                            <outlet property="dataSource" destination="Ae2-aQ-2sv" id="cZf-b0-AeE"/>
+                            <outlet property="delegate" destination="Ae2-aQ-2sv" id="qPb-04-qYb"/>
+                        </connections>
+                    </tableView>
                     <connections>
-                        <outlet property="restoreLabel" destination="ZYU-3p-2gW" id="Ip4-sA-a9f"/>
-                        <outlet property="upgradeLabel" destination="aVQ-t4-jpf" id="4gi-m2-OQM"/>
+                        <outlet property="footerView" destination="EoJ-LP-w94" id="wk5-CD-Cge"/>
+                        <outlet property="upgradeButton" destination="IWL-gP-NsT" id="ROM-vx-6CO"/>
                     </connections>
-                </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="cNf-gY-Wdr" userLabel="First Responder" sceneMemberID="firstResponder"/>
+                </tableViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="4ks-2u-nV4" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="6017" y="118"/>
+            <point key="canvasLocation" x="6061.6000000000004" y="115.59220389805098"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="GZI-BX-upL">

@@ -9,12 +9,23 @@
 import UIKit
 import StoreKit
 
+protocol IAPDelegate {
+    func restoreSuccessAlert()
+}
+
 class IAP : NSObject {
     
+    var iapDelegate : IAPDelegate!
     static let instance = IAP()
     
     let IAP_upgrade = "com.TPBSoftware.DailyTodoList.upgrade"
     var products = [SKProduct]()
+    
+    override init() {
+        super.init()
+        SKPaymentQueue.default().add(self)
+
+    }
     
     func fetchProducts() {
         if products.count > 0 {
@@ -29,14 +40,18 @@ class IAP : NSObject {
     
     func purchase() {
         if products.count > 0 {
+            print("PURCHASE...")
             let payment = SKPayment(product: products[0])
             SKPaymentQueue.default().add(payment)
         }else{
             print("no such product")
+            
         }
+        
     }
     
     func restorePurchases() {
+        print("restore purchasees")
         SKPaymentQueue.default().restoreCompletedTransactions()
     }
     
@@ -50,7 +65,7 @@ class IAP : NSObject {
 extension IAP : SKProductsRequestDelegate, SKPaymentTransactionObserver {
     func productsRequest(_ request: SKProductsRequest, didReceive response: SKProductsResponse) {
         for product in response.products {
-            print("add product: \(product)")
+            print("add product: \(product.localizedTitle)")
             products.append(product)
             break
         }
@@ -63,15 +78,46 @@ extension IAP : SKProductsRequestDelegate, SKPaymentTransactionObserver {
                 print("PURCHASED \(transaction)")
                 SKPaymentQueue.default().finishTransaction(transaction)
                 UserDefaults.standard.set(true, forKey: "upgrade")
+                print("set true for upgrade")
             break
             case .failed:
                 print("FAILED \(transaction)")
                 SKPaymentQueue.default().finishTransaction(transaction)
             break
+                /*
             case .restored:
+                print("restored?")
+                UserDefaults.standard.set(true, forKey: "upgrade")
+                print("set true for upgrade")
             break
+ */
             default:
                 break
+            }
+        }
+    }
+    
+    func paymentQueueRestoreCompletedTransactionsFinished(_ queue: SKPaymentQueue) {
+   //     print("restore completed")
+        for transaction in queue.transactions {
+                switch transaction.transactionState {
+                case .purchased:
+                    print("PURCHASED \(transaction)")
+                    SKPaymentQueue.default().finishTransaction(transaction)
+                    UserDefaults.standard.set(true, forKey: "upgrade")
+                    break
+                case .failed:
+                    print("FAILED \(transaction)")
+                    SKPaymentQueue.default().finishTransaction(transaction)
+                    break
+                case .restored:
+                    print("RESTORED \(transaction.payment.productIdentifier)")
+                    UserDefaults.standard.set(true, forKey: "upgrade")
+            //        print("set true for upgrade - show alert!")
+                    iapDelegate.restoreSuccessAlert()
+                    break
+                default:
+                    break
             }
         }
     }

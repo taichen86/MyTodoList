@@ -8,16 +8,13 @@
 
 /* Begin PBXBuildFile section */
 		091DCA8A216B57A000645214 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 091DCA89216B57A000645214 /* AppDelegate.swift */; };
-		091DCA8C216B57A000645214 /* IndexViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 091DCA8B216B57A000645214 /* IndexViewController.swift */; };
 		091DCA8F216B57A000645214 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 091DCA8D216B57A000645214 /* Main.storyboard */; };
 		091DCA91216B57A300645214 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 091DCA90216B57A300645214 /* Assets.xcassets */; };
 		091DCA94216B57A300645214 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 091DCA92216B57A300645214 /* LaunchScreen.storyboard */; };
-		091DCA9F216B643200645214 /* IndexItemCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 091DCA9E216B643200645214 /* IndexItemCell.swift */; };
 		091DCAA1216B68B200645214 /* TodoItemCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 091DCAA0216B68B200645214 /* TodoItemCell.swift */; };
 		091DCAA4216B69A700645214 /* ListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 091DCAA3216B69A700645214 /* ListViewController.swift */; };
 		093514642177368E00556F9F /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 093514632177368E00556F9F /* StoreKit.framework */; };
 		09351466217736E300556F9F /* IAP.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09351465217736E300556F9F /* IAP.swift */; };
-		09C45FF2216FAC74006994A5 /* AddTodoCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09C45FF1216FAC74006994A5 /* AddTodoCell.swift */; };
 		09FED69621793883005714DD /* SettingsViewViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09FED69521793883005714DD /* SettingsViewViewController.swift */; };
 		218B990FC95736EE8202B077 /* Pods_MyTodoList.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2CD9E7AF466B16AA8E81F6B5 /* Pods_MyTodoList.framework */; };
 /* End PBXBuildFile section */
@@ -25,17 +22,14 @@
 /* Begin PBXFileReference section */
 		091DCA86216B57A000645214 /* MyTodoList.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MyTodoList.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		091DCA89216B57A000645214 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		091DCA8B216B57A000645214 /* IndexViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IndexViewController.swift; sourceTree = "<group>"; };
 		091DCA8E216B57A000645214 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		091DCA90216B57A300645214 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		091DCA93216B57A300645214 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		091DCA95216B57A300645214 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		091DCA9E216B643200645214 /* IndexItemCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IndexItemCell.swift; sourceTree = "<group>"; };
 		091DCAA0216B68B200645214 /* TodoItemCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoItemCell.swift; sourceTree = "<group>"; };
 		091DCAA3216B69A700645214 /* ListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListViewController.swift; sourceTree = "<group>"; };
 		093514632177368E00556F9F /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		09351465217736E300556F9F /* IAP.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IAP.swift; sourceTree = "<group>"; };
-		09C45FF1216FAC74006994A5 /* AddTodoCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddTodoCell.swift; sourceTree = "<group>"; };
 		09FED69521793883005714DD /* SettingsViewViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewViewController.swift; sourceTree = "<group>"; };
 		0C1DA87CC59BC48424BD9698 /* Pods-MyTodoList.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MyTodoList.debug.xcconfig"; path = "Pods/Target Support Files/Pods-MyTodoList/Pods-MyTodoList.debug.xcconfig"; sourceTree = "<group>"; };
 		2CD9E7AF466B16AA8E81F6B5 /* Pods_MyTodoList.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_MyTodoList.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -90,9 +84,7 @@
 		091DCA9B216B636200645214 /* Model */ = {
 			isa = PBXGroup;
 			children = (
-				091DCA9E216B643200645214 /* IndexItemCell.swift */,
 				091DCAA0216B68B200645214 /* TodoItemCell.swift */,
-				09C45FF1216FAC74006994A5 /* AddTodoCell.swift */,
 				09351465217736E300556F9F /* IAP.swift */,
 			);
 			path = Model;
@@ -101,7 +93,6 @@
 		091DCAA2216B698100645214 /* View */ = {
 			isa = PBXGroup;
 			children = (
-				091DCA8B216B57A000645214 /* IndexViewController.swift */,
 				091DCAA3216B69A700645214 /* ListViewController.swift */,
 				09FED69521793883005714DD /* SettingsViewViewController.swift */,
 			);
@@ -243,10 +234,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				091DCA9F216B643200645214 /* IndexItemCell.swift in Sources */,
-				09C45FF2216FAC74006994A5 /* AddTodoCell.swift in Sources */,
 				09351466217736E300556F9F /* IAP.swift in Sources */,
-				091DCA8C216B57A000645214 /* IndexViewController.swift in Sources */,
 				09FED69621793883005714DD /* SettingsViewViewController.swift in Sources */,
 				091DCA8A216B57A000645214 /* AppDelegate.swift in Sources */,
 				091DCAA4216B69A700645214 /* ListViewController.swift in Sources */,
