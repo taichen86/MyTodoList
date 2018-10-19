@@ -7,6 +7,7 @@
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14088"/>
         <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
+        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
         <capability name="Constraints with non-1.0 multipliers" minToolsVersion="5.1"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -262,7 +263,14 @@
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="meg-90-Tke"/>
                     </view>
-                    <navigationItem key="navigationItem" id="nqy-Of-WUu"/>
+                    <navigationItem key="navigationItem" id="nqy-Of-WUu">
+                        <barButtonItem key="rightBarButtonItem" title="Item" image="settings" style="plain" id="6E7-jz-tTg">
+                            <color key="tintColor" red="0.37055522200000002" green="0.37056469920000001" blue="0.37055957319999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            <connections>
+                                <segue destination="dBv-g0-oIF" kind="show" identifier="goToSettings" id="RmE-FK-n0K"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
                     <connections>
                         <outlet property="bottomViewHeight" destination="L4t-eL-evO" id="1K1-tp-vOK"/>
                         <outlet property="calendarButton" destination="7ki-FR-atO" id="fZD-Ie-yZB"/>
@@ -282,6 +290,60 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="fLN-7r-Mrp" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="5264.8000000000002" y="115.59220389805098"/>
+        </scene>
+        <!--Settings View View Controller-->
+        <scene sceneID="8br-ig-VLF">
+            <objects>
+                <viewController id="dBv-g0-oIF" customClass="SettingsViewViewController" customModule="MyTodoList" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="HG6-Qh-j80">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="aVQ-t4-jpf" userLabel="Upgrade">
+                                <rect key="frame" x="26" y="94" width="323" height="66.5"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="22"/>
+                                <state key="normal" title="upgrade $0.99">
+                                    <color key="titleColor" red="0.26051741839999998" green="0.2605243921" blue="0.260520637" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                </state>
+                                <connections>
+                                    <action selector="upgradeButtonPressed:" destination="dBv-g0-oIF" eventType="touchUpInside" id="xp5-gC-TQA"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ZYU-3p-2gW" userLabel="Restore">
+                                <rect key="frame" x="26" y="170.5" width="323" height="66.5"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="22"/>
+                                <state key="normal" title="restore purchase">
+                                    <color key="titleColor" red="0.26051741839999998" green="0.2605243921" blue="0.260520637" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                </state>
+                                <connections>
+                                    <action selector="restoreButtonPressed:" destination="dBv-g0-oIF" eventType="touchUpInside" id="oDh-QG-AD8"/>
+                                    <action selector="upgradeButtonPressed:" destination="dBv-g0-oIF" eventType="touchUpInside" id="2iN-Nw-WB8"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstItem="aVQ-t4-jpf" firstAttribute="top" secondItem="HG6-Qh-j80" secondAttribute="topMargin" constant="30" id="3bE-ls-4ev"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="ZYU-3p-2gW" secondAttribute="trailing" constant="10" id="4MA-ME-P3F"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="aVQ-t4-jpf" secondAttribute="trailing" constant="10" id="B7s-yQ-MrH"/>
+                            <constraint firstItem="ZYU-3p-2gW" firstAttribute="top" secondItem="aVQ-t4-jpf" secondAttribute="bottom" constant="10" id="O5K-7O-n1x"/>
+                            <constraint firstItem="ZYU-3p-2gW" firstAttribute="leading" secondItem="HG6-Qh-j80" secondAttribute="leadingMargin" constant="10" id="P4l-5z-RaH"/>
+                            <constraint firstItem="ZYU-3p-2gW" firstAttribute="height" secondItem="aVQ-t4-jpf" secondAttribute="height" id="Wcv-sZ-hYD"/>
+                            <constraint firstItem="aVQ-t4-jpf" firstAttribute="leading" secondItem="HG6-Qh-j80" secondAttribute="leadingMargin" constant="10" id="oNB-6A-H2h"/>
+                            <constraint firstItem="aVQ-t4-jpf" firstAttribute="height" secondItem="HG6-Qh-j80" secondAttribute="height" multiplier="0.1" id="pGP-Yx-vBx"/>
+                        </constraints>
+                        <viewLayoutGuide key="safeArea" id="ykN-Rh-R7G"/>
+                    </view>
+                    <toolbarItems/>
+                    <simulatedToolbarMetrics key="simulatedBottomBarMetrics"/>
+                    <connections>
+                        <outlet property="restoreLabel" destination="ZYU-3p-2gW" id="Ip4-sA-a9f"/>
+                        <outlet property="upgradeLabel" destination="aVQ-t4-jpf" id="4gi-m2-OQM"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="cNf-gY-Wdr" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="6017" y="118"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="GZI-BX-upL">
@@ -306,5 +368,6 @@
         <image name="calendar2" width="64" height="64"/>
         <image name="left-arrow" width="64" height="64"/>
         <image name="right-arrow" width="64" height="64"/>
+        <image name="settings" width="64" height="64"/>
     </resources>
 </document>

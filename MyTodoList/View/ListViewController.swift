@@ -124,6 +124,7 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
        
         calendarView.delegate = self
         calendarMenu.delegate = self
+    
         
     }
     
@@ -204,7 +205,27 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
         if doneSectionExpanded {
             tableView.insertRows(at: donepaths, with: insertDir)
         }
+        checkPremiumAccess()
 
+    }
+    
+    func checkPremiumAccess() {
+        print("check premium access")
+        if userdefaults.bool(forKey: "upgrade") == false {
+            let alert = UIAlertController(title: "upgrade", message: "upgrade for full access to past and future lists?", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "no", style: .cancel, handler: { (action) in
+                print("upgrade cancelled")
+                self.loadDataForDate(listDate: Date())
+            }))
+            alert.addAction(UIAlertAction(title: "OK!", style: .default, handler: { (action) in
+                print("upgrade...")
+                IAP.instance.purchase()
+            }))
+        }
+    }
+    
+    @objc func upgrade() {
+        print("upgrade!")
     }
 
     var swipeLocked = false
@@ -582,7 +603,7 @@ self.swipeLocked = false
             }
         }else{
         // --- DONES -----
-            cell.textView.text = dones[indexPath.row][0] as! String + "  row \(cell.indexPath.row)"
+            cell.textView.text = dones[indexPath.row][0] as! String /* + "  row \(cell.indexPath.row)" */
             cell.setAsDoneCell()
             cell.registerSwipes()
             // TODO: deregister taps

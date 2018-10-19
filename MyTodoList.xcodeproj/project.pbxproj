@@ -18,6 +18,7 @@
 		093514642177368E00556F9F /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 093514632177368E00556F9F /* StoreKit.framework */; };
 		09351466217736E300556F9F /* IAP.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09351465217736E300556F9F /* IAP.swift */; };
 		09C45FF2216FAC74006994A5 /* AddTodoCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09C45FF1216FAC74006994A5 /* AddTodoCell.swift */; };
+		09FED69621793883005714DD /* SettingsViewViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09FED69521793883005714DD /* SettingsViewViewController.swift */; };
 		218B990FC95736EE8202B077 /* Pods_MyTodoList.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2CD9E7AF466B16AA8E81F6B5 /* Pods_MyTodoList.framework */; };
 /* End PBXBuildFile section */
 
@@ -35,6 +36,7 @@
 		093514632177368E00556F9F /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		09351465217736E300556F9F /* IAP.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IAP.swift; sourceTree = "<group>"; };
 		09C45FF1216FAC74006994A5 /* AddTodoCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddTodoCell.swift; sourceTree = "<group>"; };
+		09FED69521793883005714DD /* SettingsViewViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewViewController.swift; sourceTree = "<group>"; };
 		0C1DA87CC59BC48424BD9698 /* Pods-MyTodoList.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MyTodoList.debug.xcconfig"; path = "Pods/Target Support Files/Pods-MyTodoList/Pods-MyTodoList.debug.xcconfig"; sourceTree = "<group>"; };
 		2CD9E7AF466B16AA8E81F6B5 /* Pods_MyTodoList.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_MyTodoList.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		5F4049721AF9DBA28827F825 /* Pods-MyTodoList.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MyTodoList.release.xcconfig"; path = "Pods/Target Support Files/Pods-MyTodoList/Pods-MyTodoList.release.xcconfig"; sourceTree = "<group>"; };
@@ -101,6 +103,7 @@
 			children = (
 				091DCA8B216B57A000645214 /* IndexViewController.swift */,
 				091DCAA3216B69A700645214 /* ListViewController.swift */,
+				09FED69521793883005714DD /* SettingsViewViewController.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -244,6 +247,7 @@
 				09C45FF2216FAC74006994A5 /* AddTodoCell.swift in Sources */,
 				09351466217736E300556F9F /* IAP.swift in Sources */,
 				091DCA8C216B57A000645214 /* IndexViewController.swift in Sources */,
+				09FED69621793883005714DD /* SettingsViewViewController.swift in Sources */,
 				091DCA8A216B57A000645214 /* AppDelegate.swift in Sources */,
 				091DCAA4216B69A700645214 /* ListViewController.swift in Sources */,
 				091DCAA1216B68B200645214 /* TodoItemCell.swift in Sources */,
