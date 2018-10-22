@@ -56,10 +56,10 @@ extension ListViewController: UITextViewDelegate, CVCalendarViewDelegate, CVCale
      //          print("add new item \(textView.tag)")
                 addAddButtonCell()
             }
-            tableView.reloadData()
         }
         saveList()
         tableView.isScrollEnabled = true
+        tableView.reloadData()
 
     }
   
@@ -368,6 +368,7 @@ self.swipeLocked = false
         if highlightedCell != nil {
             selectRow(ip: highlightedCell!)
             highlightedCell = nil
+            tableView.reloadData()
         }
     }
 
@@ -662,12 +663,12 @@ self.swipeLocked = false
                 if todos[indexPath.row].count > 1 {
                     cell.setColor(index: todos[indexPath.row][1] as! Int)
                 }
-                /*
+                
                 if let bold = highlightedCell {
                     if indexPath == bold {
                         cell.setBold()
                     }
-                }*/
+                }
                 
                 cell.registerTaps()
                 cell.registerSwipes()
