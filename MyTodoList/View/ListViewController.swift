@@ -152,10 +152,12 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
     var deleteDir = UITableViewRowAnimation.right
     var insertDir = UITableViewRowAnimation.left
     func loadDataForDate(listDate: Date) {
-        if !isSameDate(date1: listDate, date2: Date())
-            && !userdefaults.bool(forKey: "upgrade") {
-            checkPremiumAccess()
-            return
+        if userdefaults.bool(forKey: "upgrade") == false {
+            if !isSameDate(date1: listDate, date2: Date()) {
+                upgradeText = ListViewController.UNLOCK_DATE
+                checkPremiumAccess()
+                return
+            }
         }
 
   //    print("load data for \(listDate)")
@@ -230,12 +232,18 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
         return true
     }
     
+    @IBOutlet weak var moveButton: UIButton!
+    @IBOutlet weak var alarmButton: UIButton!
+    
+    static let UNLOCK_DATE = "Access to lists for other days is a premium feature. Upgrade?"
+    static let UNLOCK_MOVE = "Moving tasks to other days is a premium feature. Upgrade?"
+    static let UNLOCK_ALARM = "Setting alarm notification for tasks is a premium feature. Upgrade?"
+    var upgradeText = UNLOCK_DATE
+    
     func checkPremiumAccess() {
-
-        let purchased = userdefaults.bool(forKey: "upgrade")
   //      print("check premium access: \(purchased)")
-        if purchased == false {
-            let alert = UIAlertController(title: "unlock", message: "upgrade for full access to past and future lists?", preferredStyle: .alert)
+        if userdefaults.bool(forKey: "upgrade") == false {
+            let alert = UIAlertController(title: "unlock", message: upgradeText, preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "later", style: .cancel, handler: nil))
             alert.addAction(UIAlertAction(title: "OK!", style: .default, handler: { (action) in
           //      print("upgrade...")
@@ -437,9 +445,14 @@ self.swipeLocked = false
     
     @IBAction func moveItemPressed(_ sender: UIButton) {
         print("move item pressed")
-        cmode = .move
-        // show calendar
-        toggleCalendar()
+        if userdefaults.bool(forKey: "upgrade") {
+            cmode = .move
+            toggleCalendar()
+        }else{
+            upgradeText = ListViewController.UNLOCK_MOVE
+            checkPremiumAccess()
+        }
+
     }
     
     @IBOutlet weak var calendarTitle: UILabel!
@@ -543,13 +556,18 @@ self.swipeLocked = false
         let next = Calendar.current.date(byAdding: .day, value: 1, to: currentListDate)
  //       print(next)
         loadDataForDate(listDate: next!)
-    //   refreshTableView()
     }
     
     func showItemBar()
     {
         dateBar.isHidden = true
+        setPremiumButtons(stat: userdefaults.bool(forKey: "upgrade"))
         itemBar.isHidden = false
+    }
+    
+    func setPremiumButtons(stat: Bool) {
+        alarmButton.alpha = 0.6
+        moveButton.alpha = 0.6
     }
     
     func hideItemBar() {
