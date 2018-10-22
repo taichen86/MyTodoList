@@ -8,7 +8,11 @@
 
 import UIKit
 import CVCalendar
-import Speech
+
+enum CMode {
+    case date
+    case move
+}
 
 extension ListViewController: UITextViewDelegate, CVCalendarViewDelegate, CVCalendarMenuViewDelegate {
     func presentationMode() -> CalendarMode {
@@ -35,27 +39,23 @@ extension ListViewController: UITextViewDelegate, CVCalendarViewDelegate, CVCale
     }
  
     func textViewDidEndEditing(_ textView: UITextView) {
-  //      print("did end editing \(textView.tag)")
+  //    print("did end editing \(textView.tag)")
         textView.isUserInteractionEnabled = false
         textView.text = textView.text.trimmingCharacters(in: .whitespaces)
         if textView.tag < todos.count {
-//        print("edit existing \(textView.tag)")
+//       print("edit existing \(textView.tag)")
             todos[textView.tag][0] = textView.text!
             if textView.text.isEmpty {
-                deleteItem( ip: (textView.superview?.superview as! TodoItemCell).indexPath )
+                deleteItem(ip: (textView.superview?.superview as! TodoItemCell).indexPath)
             }
         }else{
             var todo : [Any] = [""]
             if !textView.text.isEmpty {
                 todo[0] = textView.text!
                 todos.append(todo)
-     //           print("add new item \(textView.tag)")
+     //          print("add new item \(textView.tag)")
                 addAddButtonCell()
             }
-            
-            /*else{
-                print("empty string, no add")
-            }*/
             tableView.reloadData()
         }
         saveList()
@@ -80,13 +80,12 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
     let userdefaults = UserDefaults.standard
     var listKey = "list" // Daily 01.12.2018, Weekly 01.12.2018, Monthly 10.2018
     
-    let audioEngine = AVAudioEngine()
-    let speechRecogniser = SFSpeechRecognizer()
-    let request = SFSpeechAudioBufferRecognitionRequest()
-    var recognitionTask : SFSpeechRecognitionTask?
+
     
     var bottomViewTimer = Timer()
     var bottomViewCounter = 0
+    
+    var cmode = CMode.date
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -120,7 +119,6 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
         if userdefaults.object(forKey: "firstTime") == nil {
       //      print("first time using app")
             todos.append(["-> swipe right to complete",1])
-            
             todos.append(["<- swipe left to delete ",2])
             todos.append(["double click to edit",3])
             todos.append(["press + to add",0])
@@ -133,13 +131,6 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
        
         calendarView.delegate = self
         calendarMenu.delegate = self
-    /*
-        spinner.center = view.center
-        spinner.hidesWhenStopped = true
-        spinner.activityIndicatorViewStyle = .white
-        view.addSubview(spinner)
-        self.spinner.startAnimating()
-*/
         
     }
     var spinner = UIActivityIndicatorView()
@@ -161,7 +152,13 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
     var deleteDir = UITableViewRowAnimation.right
     var insertDir = UITableViewRowAnimation.left
     func loadDataForDate(listDate: Date) {
-  //      print("load data for \(listDate)")
+        if !isSameDate(date1: listDate, date2: Date())
+            && !userdefaults.bool(forKey: "upgrade") {
+            checkPremiumAccess()
+            return
+        }
+
+  //    print("load data for \(listDate)")
         currentListDate = listDate
         let key = dateFormatter.string(from: currentListDate)
         listKey = "\(key)"
@@ -169,6 +166,8 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
         let titleFormatter = DateFormatter()
         titleFormatter.dateFormat = "EEEE MMM d, yyyy"
         navigationItem.title = titleFormatter.string(from: listDate)
+        
+        highlightedCell = nil
         
         // clear current list
         let todorows = todos.count
@@ -196,9 +195,9 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
 
         // load new list todos
         if let content = userdefaults.array(forKey: "\(listKey)A") {
-     //       print("existing date for todos)")
+    //        print("existing date for todos)")
             todos = content as! [[Any]]
-            print(todos)
+     //       print(todos)
         }
 
         todopaths = [IndexPath]()
@@ -209,7 +208,7 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
 
         // load new list dones
         if let content = userdefaults.array(forKey: "\(listKey)B") {
-      //      print("existing data for dones")
+            print("existing data for dones")
             dones = content as! [[Any]]
             print(dones)
         }
@@ -220,12 +219,11 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
         if doneSectionExpanded {
             tableView.insertRows(at: donepaths, with: insertDir)
         }
-        checkPremiumAccess()
 
     }
     
     func isSameDate(date1: Date, date2: Date) -> Bool {
-   //     print("compare \(date1) and \(date2)")
+        print("compare \(dateFormatter.string(from: date1)) and \(dateFormatter.string(from: date2))")
         if dateFormatter.string(from: date1) != dateFormatter.string(from: date2) {
             return false
         }
@@ -233,20 +231,12 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
     }
     
     func checkPremiumAccess() {
-        if isSameDate(date1: currentListDate, date2: Date()) {
-      //      print("today's list, ok")
-            return
-        }
-        
+
         let purchased = userdefaults.bool(forKey: "upgrade")
   //      print("check premium access: \(purchased)")
         if purchased == false {
-    //        print("ALERT")
             let alert = UIAlertController(title: "unlock", message: "upgrade for full access to past and future lists?", preferredStyle: .alert)
-            alert.addAction(UIAlertAction(title: "later", style: .cancel, handler: { (action) in
-          //      print("upgrade cancelled")
-                self.loadDataForDate(listDate: Date())
-            }))
+            alert.addAction(UIAlertAction(title: "later", style: .cancel, handler: nil))
             alert.addAction(UIAlertAction(title: "OK!", style: .default, handler: { (action) in
           //      print("upgrade...")
                 IAP.instance.purchase()
@@ -260,6 +250,10 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
 
     var swipeLocked = false
     func completeItem(ip: IndexPath ) {
+        if itemBar.isHidden == false {
+            hideBottomView()
+        }
+        
         swipeLocked = true
         tableView.isScrollEnabled = false
         // complete from todo section
@@ -328,6 +322,10 @@ self.swipeLocked = false
     
     func deleteItem(ip: IndexPath) {
  //       print("delete item \(ip.section) \(ip.row)")
+        if itemBar.isHidden == false {
+            hideBottomView()
+        }
+        
         swipeLocked = true
         tableView.isScrollEnabled = false
         if ip.section < 1 {
@@ -344,11 +342,6 @@ self.swipeLocked = false
     }
     
     func saveList() {
-        /*
-        print("save list \(listKey)")
-        print(todos)
-        print(dones)
- */
         userdefaults.set(todos, forKey: "\(listKey)A")
         userdefaults.set(dones, forKey: "\(listKey)B")
     }
@@ -365,10 +358,16 @@ self.swipeLocked = false
     }
     
     @objc func keyboardWillHide() {
-   //     print("keyboard down")
         self.bottomViewHeight.constant = 0
         UIView.animate(withDuration: 0.33) {
              self.view.layoutIfNeeded()
+        }
+    }
+    
+    func unhighlight() {
+        if highlightedCell != nil {
+            selectRow(ip: highlightedCell!)
+            highlightedCell = nil
         }
     }
 
@@ -434,19 +433,33 @@ self.swipeLocked = false
         saveList()
     }
     
-
+    
+    @IBAction func moveItemPressed(_ sender: UIButton) {
+        print("move item pressed")
+        cmode = .move
+        // show calendar
+        toggleCalendar()
+    }
+    
     @IBOutlet weak var calendarTitle: UILabel!
     @IBOutlet weak var calendarMenu: CVCalendarMenuView!
     @IBOutlet weak var calendarView: CVCalendarView!
     @IBOutlet weak var calendarButton: UIButton!
     @IBAction func calendarPressed(_ sender: UIButton) {
- //       print( "calendar pressed" )
+        print( "calendar pressed" )
+        cmode = .date
+        toggleCalendar()
+    }
+    
+    func toggleCalendar() {
         if calendarView.isHidden {
             calendarTitle.text = "\n" + calendarTitleFormatter.string(from: Date())
             calendarMenu.commitMenuViewUpdate()
             calendarView.commitCalendarViewUpdate()
             showCalendar(false)
         }else{
+            // reset to today's date
+            calendarView.toggleCurrentDayView()
             showCalendar(true)
         }
     }
@@ -461,12 +474,36 @@ self.swipeLocked = false
     let calendarTitleFormatter  = DateFormatter()
     func presentedDateUpdated(_ date: CVDate) {
         if let date = date.convertedDate() {
-   //         print(date)
+            print(date)
             calendarTitle.text = "\n" + calendarTitleFormatter.string(from: date)
-            loadDataForDate(listDate: date)
+            if cmode == .date {
+                loadDataForDate(listDate: date)
+            }else{
+                moveItemTo(targetDate: date)
+            }
         }
     }
     
+    func moveItemTo( targetDate : Date ){
+        print("move item to \(targetDate)")
+        let listkey = dateFormatter.string(from: targetDate) + "A"
+        print("target key \(listkey)")
+        if let item = highlightedCell {
+            if userdefaults.object(forKey: listkey) == nil {
+                var content = [[Any]]()
+                content.append(todos[item.row])
+                userdefaults.set(content, forKey: listkey)
+            }else{
+                var content = userdefaults.array(forKey: listkey)!
+                content.append(todos[item.row])
+                userdefaults.set(content, forKey: listkey)
+            }
+            print("moved to result")
+            print(userdefaults.array(forKey: listkey))
+            deleteItem(ip: item)
+        }
+        
+    }
     
     @IBAction func todayPressed(_ sender: UIButton) {
         bottomViewCounter = 10
@@ -525,12 +562,20 @@ self.swipeLocked = false
     }
     
     func hideBottomView() {
+       unhighlight()
+        if calendarView.isHidden == false {
+            toggleCalendar()
+        }
         bottomViewHeight.constant = 0
+        /*
         UIView.animate(withDuration: 0.2) {
             self.view.layoutIfNeeded()
-        }
+        }*/
         showDateBar()
-
+        /*
+        DispatchQueue.main.asyncAfter(deadline: .now()+0.23) {
+            self.showDateBar()
+        }*/
     }
     
     func showBottomView() {
@@ -544,7 +589,6 @@ self.swipeLocked = false
     func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
         if !itemBar.isHidden {
             hideBottomView()
-
         }
     }
     
@@ -575,9 +619,9 @@ self.swipeLocked = false
             }*/
     //        print("expanded \(doneSectionExpanded)")
             if doneSectionExpanded {
-                button.setTitle("completed...", for: .normal)
+                button.setTitle("completed ↑",  for: .normal)
             }else{
-                button.setTitle("...", for: .normal)
+                button.setTitle("... ↓", for: .normal)
             }
             button.addTarget(self, action: #selector(doneSectionPressed), for: .touchUpInside)
             return button
@@ -618,12 +662,12 @@ self.swipeLocked = false
                 if todos[indexPath.row].count > 1 {
                     cell.setColor(index: todos[indexPath.row][1] as! Int)
                 }
-                
+                /*
                 if let bold = highlightedCell {
                     if indexPath == bold {
                         cell.setBold()
                     }
-                }
+                }*/
                 
                 cell.registerTaps()
                 cell.registerSwipes()
@@ -670,6 +714,7 @@ self.swipeLocked = false
             showItemBar()
             showBottomView()
         }
+        print("reload section 0")
         tableView.reloadSections([0], with: .none)
     }
     

@@ -84,13 +84,6 @@ extension IAP : SKProductsRequestDelegate, SKPaymentTransactionObserver {
                 print("FAILED \(transaction)")
                 SKPaymentQueue.default().finishTransaction(transaction)
             break
-                /*
-            case .restored:
-                print("restored?")
-                UserDefaults.standard.set(true, forKey: "upgrade")
-                print("set true for upgrade")
-            break
- */
             default:
                 break
             }

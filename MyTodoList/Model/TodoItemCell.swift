@@ -33,7 +33,7 @@ class TodoItemCell: UITableViewCell {
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code
-          selectionStyle = .none
+          selectionStyle = .gray
 //        textView.returnKeyType = UIReturnKeyType.done
  //       contentView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(cellTapped)))
 
@@ -157,7 +157,9 @@ class TodoItemCell: UITableViewCell {
     
     @objc func doubleTapped () {
  //       print("dobule Tapped \(section) \(row)")
+ //       tableView?.unhighlight()
         textView.isUserInteractionEnabled = true
+        print("first responder")
         textView.becomeFirstResponder()
     }
     /*
