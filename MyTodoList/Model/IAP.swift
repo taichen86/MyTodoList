@@ -31,7 +31,7 @@ class IAP : NSObject {
         if products.count > 0 {
             return
         }
-        print("fetch products")
+   //     print("fetch products")
         let productIDs = Set([IAP_upgrade])
         let request = SKProductsRequest(productIdentifiers: productIDs)
         request.delegate = self

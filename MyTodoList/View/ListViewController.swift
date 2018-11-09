@@ -8,10 +8,13 @@
 
 import UIKit
 import CVCalendar
+import UserNotifications
 
 enum CMode {
     case date
     case move
+    case alarm
+    case none
 }
 
 extension ListViewController: UITextViewDelegate, CVCalendarViewDelegate, CVCalendarMenuViewDelegate {
@@ -75,6 +78,7 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
     @IBOutlet weak var tableView: UITableView!
 
     var currentListDate = Date()
+    let dateFormatter2 = DateFormatter()
     let dayFormatter = DateFormatter()
     let dateFormatter = DateFormatter()
     let userdefaults = UserDefaults.standard
@@ -107,6 +111,7 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
         dateFormatter.dateFormat = "dd.MM.yyyy"
         calendarTitleFormatter.dateFormat = "MMMM yyyy"
         dayFormatter.dateFormat = "EEEE"
+        dateFormatter2.dateFormat = "d MMM yyyy"
         
         
         loadDataForDate(listDate: Date())
@@ -131,6 +136,12 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
        
         calendarView.delegate = self
         calendarMenu.delegate = self
+        
+        UNUserNotificationCenter.current().delegate = self
+        UNUserNotificationCenter.current().requestAuthorization(options: [.badge]) { (didAllow, error) in
+            
+        }
+        
         
     }
     var spinner = UIActivityIndicatorView()
@@ -210,9 +221,9 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
 
         // load new list dones
         if let content = userdefaults.array(forKey: "\(listKey)B") {
-            print("existing data for dones")
+       //     print("existing data for dones")
             dones = content as! [[Any]]
-            print(dones)
+       //     print(dones)
         }
         donepaths = [IndexPath]()
         for i in 0..<dones.count {
@@ -225,7 +236,7 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
     }
     
     func isSameDate(date1: Date, date2: Date) -> Bool {
-        print("compare \(dateFormatter.string(from: date1)) and \(dateFormatter.string(from: date2))")
+   //     print("compare \(dateFormatter.string(from: date1)) and \(dateFormatter.string(from: date2))")
         if dateFormatter.string(from: date1) != dateFormatter.string(from: date2) {
             return false
         }
@@ -442,9 +453,19 @@ self.swipeLocked = false
         saveList()
     }
     
+    @IBAction func alarmPressed(_ sender: UIButton) {
+    //    print("set alarm for ")
+        if userdefaults.bool(forKey: "upgrade") {
+            cmode = .alarm
+            toggleCalendar()
+        }else{
+            upgradeText = ListViewController.UNLOCK_ALARM
+            checkPremiumAccess()
+        }
+    }
     
     @IBAction func moveItemPressed(_ sender: UIButton) {
-        print("move item pressed")
+   //     print("move item pressed")
         if userdefaults.bool(forKey: "upgrade") {
             cmode = .move
             toggleCalendar()
@@ -460,7 +481,7 @@ self.swipeLocked = false
     @IBOutlet weak var calendarView: CVCalendarView!
     @IBOutlet weak var calendarButton: UIButton!
     @IBAction func calendarPressed(_ sender: UIButton) {
-        print( "calendar pressed" )
+   //     print( "calendar pressed" )
         cmode = .date
         toggleCalendar()
     }
@@ -472,7 +493,8 @@ self.swipeLocked = false
             calendarView.commitCalendarViewUpdate()
             showCalendar(false)
         }else{
-            // reset to today's date
+            // reset to today's date WHY??? reset calendar only - not list
+            cmode = .none
             calendarView.toggleCurrentDayView()
             showCalendar(true)
         }
@@ -487,21 +509,87 @@ self.swipeLocked = false
     
     let calendarTitleFormatter  = DateFormatter()
     func presentedDateUpdated(_ date: CVDate) {
+        // TODO: distinguish between slide and selected
         if let date = date.convertedDate() {
-            print(date)
-            calendarTitle.text = "\n" + calendarTitleFormatter.string(from: date)
-            if cmode == .date {
+     //       print(date)
+     //       calendarTitle.text = "\n" + calendarTitleFormatter.string(from: date)
+            switch cmode {
+            case .date:
                 loadDataForDate(listDate: date)
-            }else{
+            case .move:
                 moveItemTo(targetDate: date)
+            case .alarm:
+                setAlarmFor(targetDate: date)
+            default:
+                break
             }
+  
         }
     }
     
+    func didShowNextMonthView(_ date: Date) {
+   //     print("scrolled to next month \(date)")
+        calendarTitle.text = "\n" + calendarTitleFormatter.string(from: date)
+    }
+    
+    func didShowPreviousMonthView(_ date: Date) {
+    //    print("scrolled to previous month \(date)")
+        calendarTitle.text = "\n" + calendarTitleFormatter.string(from: date)
+    }
+    
+    func setAlarmFor( targetDate: Date ){
+ //       print("set alarm for \(targetDate)")
+        guard let item = highlightedCell else { return }
+        
+        var dc = DateComponents()
+        dc = Calendar.current.dateComponents([.day,.month,.year], from: targetDate)
+//        print(dc)
+        dc.hour = 7
+        dc.minute = 0
+ //       print(dc)
+        
+        let not = UNMutableNotificationContent()
+        not.title = "reminder"
+        not.body = todos[item.row][0] as! String
+        not.badge = 1
+ //       print(not)
+        let trigger = UNCalendarNotificationTrigger(dateMatching: dc, repeats: false)
+        let request = UNNotificationRequest(identifier: "reminder", content: not, trigger: trigger)
+        UNUserNotificationCenter.current().add(request, withCompletionHandler: nil)
+ 
+        hideBottomView()
+        
+        let day = NSCalendar.current.date(from: dc)
+        
+        let alert = UIAlertController(title: "notification", message: "reminder for this task set for \n \(dateFormatter2.string(from: day!))", preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+        present(alert, animated: true, completion: nil)
+        
+        /*
+        let content = UNMutableNotificationContent()
+        content.body = "test message"
+        content.title = "reminder"
+        content.badge = 1
+        print("content \(content)")
+        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 10.0, repeats: false)
+        print("trigger \(trigger)")
+        let request = UNNotificationRequest(identifier: "test", content: content, trigger: trigger)
+        UNUserNotificationCenter.current().add(request) { (error) in
+            if let error = error {
+                print(error.localizedDescription)
+            }
+        }*/
+        
+    }
+    
     func moveItemTo( targetDate : Date ){
-        print("move item to \(targetDate)")
+//        print("move item to \(targetDate)")
+        if isSameDate(date1: currentListDate, date2: targetDate) {
+  //          print("same day, no move")
+            return
+        }
         let listkey = dateFormatter.string(from: targetDate) + "A"
-        print("target key \(listkey)")
+//        print("target key \(listkey)")
         if let item = highlightedCell {
             if userdefaults.object(forKey: listkey) == nil {
                 var content = [[Any]]()
@@ -512,14 +600,15 @@ self.swipeLocked = false
                 content.append(todos[item.row])
                 userdefaults.set(content, forKey: listkey)
             }
-            print("moved to result")
-            print(userdefaults.array(forKey: listkey))
+      //      print("moved to result")
+       //     print(userdefaults.array(forKey: listkey))
             deleteItem(ip: item)
         }
         
     }
     
     @IBAction func todayPressed(_ sender: UIButton) {
+        hideCalendar()
         bottomViewCounter = 10
   //      print("go to Today")
         let today = Date()
@@ -540,8 +629,8 @@ self.swipeLocked = false
     }
     
     @IBAction func previousDayPressed(_ sender: UIButton) {
+        hideCalendar()
         bottomViewCounter = 10
-
         deleteDir = .right
         insertDir = .left
       let previous = Calendar.current.date(byAdding: .day, value: -1, to: currentListDate)
@@ -549,7 +638,15 @@ self.swipeLocked = false
    //     refreshTableView()
     }
     
+    func hideCalendar() {
+        if !calendarView.isHidden {
+            cmode = .none
+            toggleCalendar()
+        }
+    }
+    
     @IBAction func nextDayPressed(_ sender: UIButton) {
+        hideCalendar()
         bottomViewCounter = 10
         deleteDir = .left
         insertDir = .right
@@ -638,9 +735,9 @@ self.swipeLocked = false
             }*/
     //        print("expanded \(doneSectionExpanded)")
             if doneSectionExpanded {
-                button.setTitle("completed ↑",  for: .normal)
+                button.setTitle("completed...",  for: .normal)
             }else{
-                button.setTitle("... ↓", for: .normal)
+                button.setTitle("...", for: .normal)
             }
             button.addTarget(self, action: #selector(doneSectionPressed), for: .touchUpInside)
             return button
@@ -733,7 +830,6 @@ self.swipeLocked = false
             showItemBar()
             showBottomView()
         }
-        print("reload section 0")
         tableView.reloadSections([0], with: .none)
     }
     
@@ -744,5 +840,17 @@ self.swipeLocked = false
     }
     
     
+}
+
+
+extension ListViewController : UNUserNotificationCenterDelegate {
+    func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+        // display notification while app is in foreground
+        completionHandler([.alert])
+    }
+    
+    func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
+        completionHandler()
+    }
 }
 
