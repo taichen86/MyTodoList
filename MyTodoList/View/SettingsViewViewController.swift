@@ -7,8 +7,9 @@
 //
 
 import UIKit
+import MessageUI
 
-class SettingsViewViewController: UITableViewController, IAPDelegate {
+class SettingsViewViewController: UITableViewController, IAPDelegate, MFMailComposeViewControllerDelegate {
 
     @IBOutlet weak var footerView: UIView!
     override func viewDidLoad() {
@@ -69,6 +70,19 @@ class SettingsViewViewController: UITableViewController, IAPDelegate {
         print(folder)
         let filePath = folder + "/Preferences/" + Bundle.main.bundleIdentifier! + ".plist"
         
+        let mailComposer = MFMailComposeViewController()
+        mailComposer.mailComposeDelegate = self
+        mailComposer.setToRecipients(["taichen86@gmail.com"])
+        mailComposer.setSubject("todo list backup")
+        do{
+            let data = try NSData(contentsOfFile: filePath) as Data
+            mailComposer.addAttachmentData(data, mimeType: "application/xml", fileName: "DailyTodoData.tpb")
+            present(mailComposer, animated: true, completion: nil)
+        }catch{
+                print("error")
+        }
+        
+        
         /*
         if FileManager.default.fileExists(atPath: filePath) {
             print("plist exists! \(filePath)")
@@ -104,6 +118,12 @@ class SettingsViewViewController: UITableViewController, IAPDelegate {
         }
  */
     }
+    
+    func mailComposeController(_ controller: MFMailComposeViewController, didFinishWith result: MFMailComposeResult, error: Error?) {
+        dismiss(animated: true, completion: nil)
+    }
+    
+    
     
     
 }
