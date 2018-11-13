@@ -41,7 +41,6 @@ class SettingsViewViewController: UITableViewController, IAPDelegate, MFMailComp
         if IAP.instance.canMakePayment() {
             IAP.instance.purchase()
         }else{
-     //       print("user cannot make payment")
             let alert = UIAlertController(title: "error", message: "your account is not configured to make payments", preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
 
@@ -60,6 +59,16 @@ class SettingsViewViewController: UITableViewController, IAPDelegate, MFMailComp
     
     // MARK: - data backup
     @IBAction func backupPressed(_ sender: UIButton) {
+        
+        if UserDefaults.standard.bool(forKey: "upgrade") == false {
+            let alert = UIAlertController(title: "unlock", message: "Backup is a premium feature. Upgrade?", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "later", style: .cancel, handler: nil))
+            alert.addAction(UIAlertAction(title: "OK!", style: .default, handler: { (action) in
+                IAP.instance.purchase()
+            }))
+            present(alert, animated: true, completion: nil)
+            return
+        }
         
         var paths = NSSearchPathForDirectoriesInDomains(.libraryDirectory, .userDomainMask, true)
         let folder = paths[0]
@@ -80,7 +89,6 @@ class SettingsViewViewController: UITableViewController, IAPDelegate, MFMailComp
         }
         
     }
-    
 
     
     func mailComposeController(_ controller: MFMailComposeViewController, didFinishWith result: MFMailComposeResult, error: Error?) {

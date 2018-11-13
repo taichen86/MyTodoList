@@ -740,6 +740,9 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
     }
     
     @objc func refreshView(){
+        let alert = UIAlertController(title: "success", message: "Backup data imported!", preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "ok", style: .default, handler: nil))
+        present(alert, animated: true, completion: nil)
         loadDataForDate(listDate: Date())
     }
     
