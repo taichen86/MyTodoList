@@ -14,9 +14,7 @@ class SettingsViewViewController: UITableViewController, IAPDelegate, MFMailComp
     @IBOutlet weak var footerView: UIView!
     override func viewDidLoad() {
         super.viewDidLoad()
-        (UIApplication.shared.delegate as! AppDelegate).currentVC = self
-   //     tableView.separatorStyle = .none
-   //     tableView.backgroundColor = UIColor(red: 250.0/255.0, green: 250.0/255.0, blue: 240.0/255.0, alpha: 1.0)
+
         tableView.tableFooterView = footerView
         upgradeButton.titleLabel?.numberOfLines = 2
         upgradeButton.titleLabel?.lineBreakMode = .byWordWrapping
@@ -62,62 +60,28 @@ class SettingsViewViewController: UITableViewController, IAPDelegate, MFMailComp
     
     // MARK: - data backup
     @IBAction func backupPressed(_ sender: UIButton) {
-        print("export plist to email")
         
         var paths = NSSearchPathForDirectoriesInDomains(.libraryDirectory, .userDomainMask, true)
-        print(paths)
         let folder = paths[0]
-        print(folder)
         let filePath = folder + "/Preferences/" + Bundle.main.bundleIdentifier! + ".plist"
         
         let mailComposer = MFMailComposeViewController()
         mailComposer.mailComposeDelegate = self
-        mailComposer.setToRecipients(["taichen86@gmail.com"])
-        mailComposer.setSubject("todo list backup")
+        mailComposer.setSubject("Daily Todo List backup data")
+        mailComposer.setMessageBody("This file contains the backup data of your Daily Todo List app. To import this data to your Daily Todo List app, simply open this file (long press and select Copy to TodoList) on your phone. You need to have the app installed and updated for this to work.", isHTML: false)
         do{
             let data = try NSData(contentsOfFile: filePath) as Data
-            mailComposer.addAttachmentData(data, mimeType: "application/xml", fileName: "DailyTodoData.tpb")
+            mailComposer.addAttachmentData(data, mimeType: "application/xml", fileName: "DailyTodoListData.tpb")
             present(mailComposer, animated: true, completion: nil)
         }catch{
-                print("error")
+           let alert = UIAlertController(title: "error", message: "Your data could not be backed up. Please contact the developer.", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "ok", style: .default, handler: nil))
+            present(alert, animated: true, completion: nil)
         }
         
-        
-        /*
-        if FileManager.default.fileExists(atPath: filePath) {
-            print("plist exists! \(filePath)")
-            if let dict = NSDictionary(contentsOfFile: filePath) {
-                print(dict)
-            }
-        }*/
-        
-        /*
-        let data = UserDefaults.standard.dictionaryRepresentation()
-        print(data)
-        */
-        /*
-
-        let testDictData = data["13.11.2018A"]
-        print("test data \(testDictData)")
-        
-        var dict = [String:[[Any]]]()
-        dict["13.11.2018A"] = testDictData as! [[Any]]
-        print("now... \(dict)")
-        
-        do{
-            let jsonData = try JSONSerialization.data(withJSONObject: dict, options: .prettyPrinted)
-            print(jsonData)
-            let decoded  = try JSONSerialization.jsonObject(with: jsonData, options: [])
-            print(decoded)
-            
-            let reconstructedDict = decoded as! [String:[[Any]]]
-            print(reconstructedDict)
-            
-        }catch{
-            print("backup error")
-        }
- */
     }
+    
+
     
     func mailComposeController(_ controller: MFMailComposeViewController, didFinishWith result: MFMailComposeResult, error: Error?) {
         dismiss(animated: true, completion: nil)

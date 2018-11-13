@@ -12,32 +12,57 @@ import UIKit
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
-    var currentVC : UIViewController?
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
-        // Override point for customization after application launch.
-  //      UserDefaults.standard.removePersistentDomain(forName: Bundle.main.bundleIdentifier!)
-  //     UserDefaults.standard.synchronize()
+        /*
         let path = NSSearchPathForDirectoriesInDomains(.libraryDirectory, .userDomainMask, true)
-  //      print("path \(path[0])")
         let filepath = "\(path[0])/Preferences/com.TPBSoftware.DailyTodoList.plist"
         let size = try? FileManager.default.attributesOfItem(atPath: filepath)
- //       print(size?[FileAttributeKey.size])
+         */
         
         IAP.instance.fetchProducts()
         UIApplication.shared.applicationIconBadgeNumber = 0
-    
         return true
     }
     
     
     func application(_ app: UIApplication, open url: URL, options: [UIApplicationOpenURLOptionsKey : Any] = [:]) -> Bool {
-        print("OPENING!! \(url)")
+  //      print("OPENING!! \(url)")
         do{
             let data = try Data(contentsOf: url)
-            print(data)
+            var editedDict = [String:[[Any]]]()
+
+            if let dict = NSDictionary(contentsOf: url) as? [String:Any]{
+                for list in dict {
+                    if let items = list.value as? [[Any]]{
+                        if items.count > 0 {
+                            editedDict[list.key] = items
+                        }
+                    }
+                    
+                    
+                }
+
+                for backupList in editedDict {
+                    var newList = [[Any]]()
+                    if let existingList = UserDefaults.standard.object(forKey: backupList.key) as? [[Any]] {
+                        newList = existingList
+                    }
+                    
+                    for backupItem in backupList.value {
+                        newList.append(backupItem)
+                    }
+                    UserDefaults.standard.set(newList, forKey: backupList.key)
+                }
+            }
+            
+            let name = Notification.Name(rawValue: "importcompletednotification")
+            NotificationCenter.default.post(name: name, object: nil)
+            
+
         }catch{
-            print("cannot import :(")
+            let name = Notification.Name(rawValue: "importerrornotification")
+            NotificationCenter.default.post(name: name, object: nil)
         }
         return true
     }

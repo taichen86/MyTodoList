@@ -37,16 +37,13 @@ extension ListViewController: UITextViewDelegate, CVCalendarViewDelegate, CVCale
     }
     
     func textViewDidBeginEditing(_ textView: UITextView) {
-   //     print("------- did begin editing \(textView.tag)")
         tableView.isScrollEnabled = false
     }
  
     func textViewDidEndEditing(_ textView: UITextView) {
-  //    print("did end editing \(textView.tag)")
         textView.isUserInteractionEnabled = false
         textView.text = textView.text.trimmingCharacters(in: .whitespaces)
         if textView.tag < todos.count {
-//       print("edit existing \(textView.tag)")
             todos[textView.tag][0] = textView.text!
             if textView.text.isEmpty {
                 deleteItem(ip: (textView.superview?.superview as! TodoItemCell).indexPath)
@@ -56,7 +53,6 @@ extension ListViewController: UITextViewDelegate, CVCalendarViewDelegate, CVCale
             if !textView.text.isEmpty {
                 todo[0] = textView.text!
                 todos.append(todo)
-     //          print("add new item \(textView.tag)")
                 addAddButtonCell()
             }
         }
@@ -91,8 +87,12 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
     
     var cmode = CMode.date
     
+    let importNotificationName = Notification.Name(rawValue: "importcompletednotification")
+    let importErrorNotificationName = Notification.Name(rawValue: "importerrornotification")
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        createObservers()
         
         IAP.instance.iapDelegate = self
         
@@ -100,13 +100,11 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
         tableView.dataSource = self
         tableView.backgroundColor = colors[4]
        
-        // TODO: disable textfields by default
-  //      view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(viewTapped)))
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: .UIKeyboardWillShow, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: .UIKeyboardWillHide, object: nil)
         
         bottomViewHeight.constant = 0.07 * view.bounds.height
- //       print("bottom view height \(bottomViewHeight.constant)")
+        
         // show date
         dateFormatter.dateFormat = "dd.MM.yyyy"
         calendarTitleFormatter.dateFormat = "MMMM yyyy"
@@ -115,20 +113,13 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
         
         
         loadDataForDate(listDate: Date())
- 
-        // first time user
-   //     userdefaults.removeObject(forKey: "firstTime")
- //       print("lets see user defaults stuff")
-  //      print( userdefaults.object(forKey: "firstTime") )
         
         if userdefaults.object(forKey: "firstTime") == nil {
-      //      print("first time using app")
             todos.append(["-> swipe right to complete",1])
             todos.append(["<- swipe left to delete ",2])
             todos.append(["double click to edit",3])
             todos.append(["press + to add",0])
             userdefaults.set(false, forKey: "firstTime")
-   //         print(userdefaults.object(forKey: "firstTime"))
         }
     
         bottomViewCounter = 6
@@ -152,7 +143,6 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
         }
         if bottomViewCounter > 0 {
             bottomViewCounter -= 1
-   //         print("bottom view counter \(bottomViewCounter)")
             return
         }
         if bottomViewHeight.constant > 0 {
@@ -171,11 +161,9 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
             }
         }
 
-  //    print("load data for \(listDate)")
         currentListDate = listDate
         let key = dateFormatter.string(from: currentListDate)
         listKey = "\(key)"
-  //      print("list key \(listKey)")
         let titleFormatter = DateFormatter()
         titleFormatter.dateFormat = "EEEE MMM d, yyyy"
         navigationItem.title = titleFormatter.string(from: listDate)
@@ -184,33 +172,27 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
         
         // clear current list
         let todorows = todos.count
- //       print("current list todos count \(todorows)")
         todos.removeAll()
         var todopaths = [IndexPath]()
         for i in 0..<todorows {
             todopaths.append(IndexPath(row: i, section: 0))
         }
-  //      print("delete current list todos")
         tableView.deleteRows(at: todopaths, with: deleteDir)
         
         
         let donerows = dones.count
-  //      print("current list dones count \(donerows)")
         dones.removeAll()
         var donepaths = [IndexPath]()
         for i in 0..<donerows {
             donepaths.append(IndexPath(row: i, section: 1))
         }
- //       print("delete current list dones")
         if doneSectionExpanded {
             tableView.deleteRows(at: donepaths, with: deleteDir)
         }
 
         // load new list todos
         if let content = userdefaults.array(forKey: "\(listKey)A") {
-    //        print("existing date for todos)")
             todos = content as! [[Any]]
-     //       print(todos)
         }
 
         todopaths = [IndexPath]()
@@ -221,9 +203,7 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
 
         // load new list dones
         if let content = userdefaults.array(forKey: "\(listKey)B") {
-       //     print("existing data for dones")
             dones = content as! [[Any]]
-       //     print(dones)
         }
         donepaths = [IndexPath]()
         for i in 0..<dones.count {
@@ -236,7 +216,6 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
     }
     
     func isSameDate(date1: Date, date2: Date) -> Bool {
-   //     print("compare \(dateFormatter.string(from: date1)) and \(dateFormatter.string(from: date2))")
         if dateFormatter.string(from: date1) != dateFormatter.string(from: date2) {
             return false
         }
@@ -252,12 +231,10 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
     var upgradeText = UNLOCK_DATE
     
     func checkPremiumAccess() {
-  //      print("check premium access: \(purchased)")
         if userdefaults.bool(forKey: "upgrade") == false {
             let alert = UIAlertController(title: "unlock", message: upgradeText, preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "later", style: .cancel, handler: nil))
             alert.addAction(UIAlertAction(title: "OK!", style: .default, handler: { (action) in
-          //      print("upgrade...")
                 IAP.instance.purchase()
             }))
             self.present(alert, animated: true, completion: nil)
@@ -277,7 +254,6 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
         tableView.isScrollEnabled = false
         // complete from todo section
         if ip.section < 1 {
-     //       print("complete \(todos[ip.row])")
             if let bold = highlightedCell {
                 if bold == ip {
                     highlightedCell = nil
@@ -293,54 +269,27 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
                 tableView.reloadData()
                 swipeLocked = false
                 self.tableView.isScrollEnabled = true
-                /*
-                let donePath = IndexPath(row: self.dones.count-1, section: 1)
-                if dones.count > 1 && cellVisible(path: <#T##IndexPath#>) {
-                    print("done cell visible animate")
-                    DispatchQueue.main.asyncAfter(deadline: .now()+0.9) {
-                        self.tableView.insertRows(at: [donePath], with: .fade)
-                        self.tableView.reloadData()
-                        self.swipeLocked = false
-                        self.tableView.isScrollEnabled = true
-                }
-                }else{
-                    print("done cell not visible")
-                 
-                }*/
+  
             }
      
         }else{
         // reopen done item
-       //         print("reopen row \(ip.row) \(dones.count)")
                 let item = dones[ip.row]
                 dones.remove(at: ip.row)
             self.tableView.deleteRows(at: [ip], with: .right)
-/*
-            UIView.animate(withDuration: 0.3) {
-            }*/
-            
+
                 todos.append(item)
             self.tableView.insertRows(at: [IndexPath(row: self.todos.count-1, section: 0)], with: .fade)
-self.swipeLocked = false
+            self.swipeLocked = false
             self.tableView.isScrollEnabled = true
-            /*
-            DispatchQueue.main.asyncAfter(deadline: .now()+0.9) {
-                UIView.animate(withDuration: 0.3) {
-                    self.tableView.reloadData()
-             
-                 //
-                }
-            }
-            */
+
             
         }
-  //      print(todos)
-  //      print(dones)
+
         saveList()
     }
     
     func deleteItem(ip: IndexPath) {
- //       print("delete item \(ip.section) \(ip.row)")
         if itemBar.isHidden == false {
             hideBottomView()
         }
@@ -367,7 +316,6 @@ self.swipeLocked = false
     
     @objc func keyboardWillShow(not: NSNotification) {
         if let size = (not.userInfo?[UIKeyboardFrameBeginUserInfoKey] as? NSValue)?.cgRectValue {
-     //       print(size)
             self.bottomViewHeight.constant = size.height + CGFloat(10)
             UIView.animate(withDuration: 0.33) {
                 self.view.layoutIfNeeded()
@@ -396,9 +344,7 @@ self.swipeLocked = false
     }
     
     @objc func doneSectionPressed() {
-   //     print("done section pressed \(dones.count)")
         if dones.count == 0 {
-      //      print("no dones!")
             doneSectionExpanded = !doneSectionExpanded
             tableView.reloadData()
             return
@@ -407,7 +353,6 @@ self.swipeLocked = false
         for count in 1 ... dones.count {
             paths.append(IndexPath(row: count-1, section: 1))
         }
-   //     print(paths)
         doneSectionExpanded = !doneSectionExpanded
         if doneSectionExpanded {
             tableView.insertRows(at: paths, with: .automatic)
@@ -435,7 +380,6 @@ self.swipeLocked = false
                   UIColor(red: CGFloat(165.0/255.0), green: CGFloat(210.0/255.0), blue: CGFloat(255.0/255.0), alpha: 1.0),
                   UIColor(red: 250.0/255.0, green: 250.0/255.0, blue: 240.0/255.0, alpha: 1.0)]
     @IBAction func colorSelected(_ sender: UIButton) {
-  //      print(sender.tag)
         bottomViewCounter = 10
         guard let selected = highlightedCell else {
             return
@@ -449,12 +393,10 @@ self.swipeLocked = false
         }else{
             todos[selected.row][1] = sender.tag-1
         }
-  //      print(todos)
         saveList()
     }
     
     @IBAction func alarmPressed(_ sender: UIButton) {
-    //    print("set alarm for ")
         if userdefaults.bool(forKey: "upgrade") {
             cmode = .alarm
             toggleCalendar()
@@ -465,7 +407,6 @@ self.swipeLocked = false
     }
     
     @IBAction func moveItemPressed(_ sender: UIButton) {
-   //     print("move item pressed")
         if userdefaults.bool(forKey: "upgrade") {
             cmode = .move
             toggleCalendar()
@@ -481,7 +422,6 @@ self.swipeLocked = false
     @IBOutlet weak var calendarView: CVCalendarView!
     @IBOutlet weak var calendarButton: UIButton!
     @IBAction func calendarPressed(_ sender: UIButton) {
-   //     print( "calendar pressed" )
         cmode = .date
         toggleCalendar()
     }
@@ -511,8 +451,6 @@ self.swipeLocked = false
     func presentedDateUpdated(_ date: CVDate) {
         // TODO: distinguish between slide and selected
         if let date = date.convertedDate() {
-     //       print(date)
-     //       calendarTitle.text = "\n" + calendarTitleFormatter.string(from: date)
             switch cmode {
             case .date:
                 loadDataForDate(listDate: date)
@@ -528,31 +466,25 @@ self.swipeLocked = false
     }
     
     func didShowNextMonthView(_ date: Date) {
-   //     print("scrolled to next month \(date)")
         calendarTitle.text = "\n" + calendarTitleFormatter.string(from: date)
     }
     
     func didShowPreviousMonthView(_ date: Date) {
-    //    print("scrolled to previous month \(date)")
         calendarTitle.text = "\n" + calendarTitleFormatter.string(from: date)
     }
     
     func setAlarmFor( targetDate: Date ){
- //       print("set alarm for \(targetDate)")
         guard let item = highlightedCell else { return }
         
         var dc = DateComponents()
         dc = Calendar.current.dateComponents([.day,.month,.year], from: targetDate)
-//        print(dc)
         dc.hour = 7
         dc.minute = 0
- //       print(dc)
         
         let not = UNMutableNotificationContent()
         not.title = "reminder"
         not.body = todos[item.row][0] as! String
         not.badge = 1
- //       print(not)
         let trigger = UNCalendarNotificationTrigger(dateMatching: dc, repeats: false)
         let request = UNNotificationRequest(identifier: "reminder", content: not, trigger: trigger)
         UNUserNotificationCenter.current().add(request, withCompletionHandler: nil)
@@ -565,31 +497,13 @@ self.swipeLocked = false
         alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
         present(alert, animated: true, completion: nil)
         
-        /*
-        let content = UNMutableNotificationContent()
-        content.body = "test message"
-        content.title = "reminder"
-        content.badge = 1
-        print("content \(content)")
-        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 10.0, repeats: false)
-        print("trigger \(trigger)")
-        let request = UNNotificationRequest(identifier: "test", content: content, trigger: trigger)
-        UNUserNotificationCenter.current().add(request) { (error) in
-            if let error = error {
-                print(error.localizedDescription)
-            }
-        }*/
-        
     }
     
     func moveItemTo( targetDate : Date ){
-//        print("move item to \(targetDate)")
         if isSameDate(date1: currentListDate, date2: targetDate) {
-  //          print("same day, no move")
             return
         }
         let listkey = dateFormatter.string(from: targetDate) + "A"
-//        print("target key \(listkey)")
         if let item = highlightedCell {
             if userdefaults.object(forKey: listkey) == nil {
                 var content = [[Any]]()
@@ -600,8 +514,7 @@ self.swipeLocked = false
                 content.append(todos[item.row])
                 userdefaults.set(content, forKey: listkey)
             }
-      //      print("moved to result")
-       //     print(userdefaults.array(forKey: listkey))
+
             deleteItem(ip: item)
         }
         
@@ -610,10 +523,7 @@ self.swipeLocked = false
     @IBAction func todayPressed(_ sender: UIButton) {
         hideCalendar()
         bottomViewCounter = 10
-  //      print("go to Today")
         let today = Date()
-  //      print("list date \(currentListDate)")
-  //      print("today \(today)")
         if dateFormatter.string(from: currentListDate) == dateFormatter.string(from: today) {
             return
         }
@@ -625,7 +535,6 @@ self.swipeLocked = false
             insertDir = .left
         }
         loadDataForDate(listDate: Date())
-  //      refreshTableView()
     }
     
     @IBAction func previousDayPressed(_ sender: UIButton) {
@@ -635,7 +544,6 @@ self.swipeLocked = false
         insertDir = .left
       let previous = Calendar.current.date(byAdding: .day, value: -1, to: currentListDate)
         loadDataForDate(listDate: previous!)
-   //     refreshTableView()
     }
     
     func hideCalendar() {
@@ -651,7 +559,6 @@ self.swipeLocked = false
         deleteDir = .left
         insertDir = .right
         let next = Calendar.current.date(byAdding: .day, value: 1, to: currentListDate)
- //       print(next)
         loadDataForDate(listDate: next!)
     }
     
@@ -683,15 +590,8 @@ self.swipeLocked = false
             toggleCalendar()
         }
         bottomViewHeight.constant = 0
-        /*
-        UIView.animate(withDuration: 0.2) {
-            self.view.layoutIfNeeded()
-        }*/
         showDateBar()
-        /*
-        DispatchQueue.main.asyncAfter(deadline: .now()+0.23) {
-            self.showDateBar()
-        }*/
+ 
     }
     
     func showBottomView() {
@@ -728,12 +628,7 @@ self.swipeLocked = false
             let button = UIButton(type: .system)
             button.setTitleColor(UIColor.darkGray, for: .normal)
             button.backgroundColor = colors[4]
-/*
-            if dones.count < 1 {
-                button.setTitle("...", for: .normal)
-                return button
-            }*/
-    //        print("expanded \(doneSectionExpanded)")
+
             if doneSectionExpanded {
                 button.setTitle("completed...",  for: .normal)
             }else{
@@ -771,7 +666,6 @@ self.swipeLocked = false
                 // --- TODOS -----
         if indexPath.section < 1 {
             if indexPath.row < todos.count {
-          //      cell.hideAddButton()
                 cell.setAsTodoCell()
 
                 cell.textView.text = todos[indexPath.row][0] as! String /*+ "  row \(cell.indexPath.row)"*/
@@ -797,7 +691,6 @@ self.swipeLocked = false
             cell.setAsDoneCell()
             cell.registerSwipes()
             // TODO: deregister taps
-        //    cell.removeTapGestures()
             if dones[indexPath.row].count > 1 {
                 cell.setColor(index: dones[indexPath.row][1] as! Int)
             }
@@ -837,6 +730,27 @@ self.swipeLocked = false
         let alert = UIAlertController(title: "success", message: "purchase restored", preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
         present(alert, animated: true, completion: nil)
+    }
+    
+    // MARK: notification observers
+    
+    func createObservers() {
+        NotificationCenter.default.addObserver(self, selector: #selector(refreshView), name: importNotificationName, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(showImportErrorAlert), name: importErrorNotificationName, object: nil)
+    }
+    
+    @objc func refreshView(){
+        loadDataForDate(listDate: Date())
+    }
+    
+    @objc func showImportErrorAlert(){
+        let alert = UIAlertController(title: "error", message: "Your data could not be imported. Please contact the developer.", preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "ok", style: .default, handler: nil))
+        present(alert, animated: true, completion: nil)
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
     }
     
     
