@@ -29,6 +29,7 @@ class SettingsViewViewController: UITableViewController, IAPDelegate {
         
     }
     
+    // MARK: - in app purchase
     func setIAP () {
         let formatter = NumberFormatter()
         formatter.numberStyle = .currency
@@ -57,5 +58,52 @@ class SettingsViewViewController: UITableViewController, IAPDelegate {
         alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
         present(alert, animated: true, completion: nil)
     }
+    
+    // MARK: - data backup
+    @IBAction func backupPressed(_ sender: UIButton) {
+        print("export plist to email")
+        
+        var paths = NSSearchPathForDirectoriesInDomains(.libraryDirectory, .userDomainMask, true)
+        print(paths)
+        let folder = paths[0]
+        print(folder)
+        let filePath = folder + "/Preferences/" + Bundle.main.bundleIdentifier! + ".plist"
+        
+        /*
+        if FileManager.default.fileExists(atPath: filePath) {
+            print("plist exists! \(filePath)")
+            if let dict = NSDictionary(contentsOfFile: filePath) {
+                print(dict)
+            }
+        }*/
+        
+        /*
+        let data = UserDefaults.standard.dictionaryRepresentation()
+        print(data)
+        */
+        /*
+
+        let testDictData = data["13.11.2018A"]
+        print("test data \(testDictData)")
+        
+        var dict = [String:[[Any]]]()
+        dict["13.11.2018A"] = testDictData as! [[Any]]
+        print("now... \(dict)")
+        
+        do{
+            let jsonData = try JSONSerialization.data(withJSONObject: dict, options: .prettyPrinted)
+            print(jsonData)
+            let decoded  = try JSONSerialization.jsonObject(with: jsonData, options: [])
+            print(decoded)
+            
+            let reconstructedDict = decoded as! [String:[[Any]]]
+            print(reconstructedDict)
+            
+        }catch{
+            print("backup error")
+        }
+ */
+    }
+    
     
 }
