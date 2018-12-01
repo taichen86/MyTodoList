@@ -315,13 +315,13 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
     }
     
     @objc func keyboardWillShow(not: NSNotification) {
+        /*
         if let size = (not.userInfo?[UIKeyboardFrameBeginUserInfoKey] as? NSValue)?.cgRectValue {
             self.bottomViewHeight.constant = size.height + CGFloat(10)
             UIView.animate(withDuration: 0.33) {
                 self.view.layoutIfNeeded()
             }
-
-        }
+        }*/
     }
     
     @objc func keyboardWillHide() {
@@ -653,9 +653,14 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
     }
 
     // --------   DEQUEUE REUSABLE CELL ---------------
+    
+    var cellHeights = [Int:CGFloat]()
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-  //      print("cellForRowAt \(indexPath.section) row \(indexPath.row)")
+        print("cellForRowAt \(indexPath.section) row \(indexPath.row)")
         let cell = tableView.dequeueReusableCell(withIdentifier: "TodoItemCell", for: indexPath) as! TodoItemCell
+        
+
+        
         cell.textView.isUserInteractionEnabled = false
         cell.tableView = self
         cell.indexPath = indexPath
@@ -696,8 +701,19 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
             }
         }
         return cell
+
     }
     
+    func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
+        print("estimated height: \(cellHeights[indexPath.row])")
+        return cellHeights[indexPath.row] ?? 100.0
+    }
+    
+    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        cellHeights[indexPath.row] = cell.frame.size.height
+        print("cell height \(cell.frame.height)")
+
+    }
     
     // --------   SELECT ROW ---------------
     var highlightedCell : IndexPath?
@@ -723,7 +739,8 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
             showItemBar()
             showBottomView()
         }
-        tableView.reloadSections([0], with: .none)
+
+        tableView.reloadRows(at: [ip], with: .none)
     }
     
     func restoreSuccessAlert() {

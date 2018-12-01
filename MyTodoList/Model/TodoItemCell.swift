@@ -36,7 +36,7 @@ class TodoItemCell: UITableViewCell {
           selectionStyle = .none
 //        textView.returnKeyType = UIReturnKeyType.done
  //       contentView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(cellTapped)))
-
+print(frame.height)
 
     }
     
@@ -162,24 +162,9 @@ class TodoItemCell: UITableViewCell {
         print("first responder")
         textView.becomeFirstResponder()
     }
-    /*
-    var isBold = false
-    func toggleBold() {
-        print("currently bold??? \(isBold)")
-        if isBold {
-            textView.text = textView.attributedText.string
-            tableView?.highlightedCell = nil
-        }else{
-            textView.attributedText = NSAttributedString(string: textView.text, attributes: boldAttributes)
-            tableView?.highlightedCell = indexPath
-        }
-        isBold = !isBold
-        print("after toggle bold \(section) \(row) \(isBold)")
-    }*/
 
     func setBold() {
-   //     print("set bold")
-   //     isBold = true
+        
         textView.attributedText = NSAttributedString(string: textView.text, attributes: boldAttributes)
     }
 
