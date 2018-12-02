@@ -454,31 +454,31 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
     }
     
     func toggleCalendar() {
-        if calendarView.isHidden {
+        if calendarView.isHidden { // show calendar
             calendarTitle.text = "\n" + calendarTitleFormatter.string(from: Date())
             calendarMenu.commitMenuViewUpdate()
             calendarView.commitCalendarViewUpdate()
-            showCalendar(false)
-        }else{
-            // reset to today's date WHY??? reset calendar only - not list
+            showCalendar(true)
+        }else{ // hide calendar
             calendarButton.alpha = 0.6
             alarmButton.alpha = 0.6
             moveButton.alpha = 0.6
             cmode = .none
             calendarView.toggleCurrentDayView()
-            showCalendar(true)
+            showCalendar(false)
         }
     }
 
     func showCalendar( _ stat: Bool){
-        calendarView.isHidden = stat
-        calendarMenu.isHidden = stat
-        calendarTitle.isHidden = stat
+        calendarView.isHidden = !stat
+        calendarMenu.isHidden = !stat
+        calendarTitle.isHidden = !stat
     }
     
     
     let calendarTitleFormatter  = DateFormatter()
     func presentedDateUpdated(_ date: CVDate) {
+        print("presentedDateUpdate \(date)")
         // TODO: distinguish between slide and selected
         if let date = date.convertedDate() {
             switch cmode {
