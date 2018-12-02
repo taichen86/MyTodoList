@@ -9,6 +9,7 @@
 import UIKit
 import CVCalendar
 import UserNotifications
+import AudioToolbox
 
 enum CMode {
     case date
@@ -93,6 +94,7 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
     
     let importNotificationName = Notification.Name(rawValue: "importcompletednotification")
     let importErrorNotificationName = Notification.Name(rawValue: "importerrornotification")
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -244,9 +246,7 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
             self.present(alert, animated: true, completion: nil)
         }
     }
-    
  
-    
 
     var swipeLocked = false
     func completeItem(ip: IndexPath ) {
@@ -319,13 +319,6 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
     }
     
     @objc func keyboardWillShow(not: NSNotification) {
-        /*
-        if let size = (not.userInfo?[UIKeyboardFrameBeginUserInfoKey] as? NSValue)?.cgRectValue {
-            self.bottomViewHeight.constant = size.height + CGFloat(10)
-            UIView.animate(withDuration: 0.33) {
-                self.view.layoutIfNeeded()
-            }
-        }*/
     }
     
     var activeIndexPath = IndexPath(row: 0, section: 0)
@@ -405,9 +398,12 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
                   UIColor(red: CGFloat(165.0/255.0), green: CGFloat(210.0/255.0), blue: CGFloat(255.0/255.0), alpha: 1.0),
                   UIColor(red: 250.0/255.0, green: 250.0/255.0, blue: 240.0/255.0, alpha: 1.0)]
     @IBAction func colorSelected(_ sender: UIButton) {
+        AudioServicesPlaySystemSound(1104)
         bottomViewCounter = 10
-        guard let selected = highlightedCell else {
-            return
+        guard let selected = highlightedCell else { return }
+        
+        if !calendarView.isHidden {
+            toggleCalendar()
         }
         
         let cell = tableView.cellForRow(at: selected) as! TodoItemCell
@@ -422,6 +418,8 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
     }
     
     @IBAction func alarmPressed(_ sender: UIButton) {
+        AudioServicesPlaySystemSound(1104)
+        alarmButton.alpha = 1.0
         if userdefaults.bool(forKey: "upgrade") {
             cmode = .alarm
             toggleCalendar()
@@ -432,6 +430,8 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
     }
     
     @IBAction func moveItemPressed(_ sender: UIButton) {
+        AudioServicesPlaySystemSound(1104)
+        moveButton.alpha = 1.0
         if userdefaults.bool(forKey: "upgrade") {
             cmode = .move
             toggleCalendar()
@@ -447,6 +447,8 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
     @IBOutlet weak var calendarView: CVCalendarView!
     @IBOutlet weak var calendarButton: UIButton!
     @IBAction func calendarPressed(_ sender: UIButton) {
+        calendarButton.alpha = 1.0
+        AudioServicesPlaySystemSound(1104)
         cmode = .date
         toggleCalendar()
     }
@@ -459,6 +461,9 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
             showCalendar(false)
         }else{
             // reset to today's date WHY??? reset calendar only - not list
+            calendarButton.alpha = 0.6
+            alarmButton.alpha = 0.6
+            moveButton.alpha = 0.6
             cmode = .none
             calendarView.toggleCurrentDayView()
             showCalendar(true)
@@ -546,6 +551,7 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
     }
     
     @IBAction func todayPressed(_ sender: UIButton) {
+        AudioServicesPlaySystemSound(1104)
         hideCalendar()
         bottomViewCounter = 10
         let today = Date()
@@ -563,6 +569,7 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
     }
     
     @IBAction func previousDayPressed(_ sender: UIButton) {
+        AudioServicesPlaySystemSound(1104)
         hideCalendar()
         bottomViewCounter = 10
         deleteDir = .right
@@ -579,6 +586,7 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
     }
     
     @IBAction func nextDayPressed(_ sender: UIButton) {
+        AudioServicesPlaySystemSound(1104)
         hideCalendar()
         bottomViewCounter = 10
         deleteDir = .left
@@ -683,9 +691,7 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
     //    print("cellForRowAt \(indexPath.section) row \(indexPath.row)")
         let cell = tableView.dequeueReusableCell(withIdentifier: "TodoItemCell", for: indexPath) as! TodoItemCell
-        
-
-        
+      
         cell.textView.isUserInteractionEnabled = false
         cell.tableView = self
         cell.indexPath = indexPath
@@ -705,6 +711,7 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
                 
                 if let bold = highlightedCell {
                     if indexPath == bold {
+                        AudioServicesPlaySystemSound(1104)
                         cell.setBold()
                     }
                 }
@@ -745,6 +752,7 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
     func selectRow(ip: IndexPath) {
         if ip.section > 0 { return }
         if ip.row >= todos.count { return }
+        
         // press on todo item
         view.endEditing(true)
         if let selected = highlightedCell {

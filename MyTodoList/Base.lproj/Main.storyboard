@@ -138,17 +138,17 @@
                                                             <action selector="colorSelected:" destination="j8E-Ih-Wpi" eventType="touchUpInside" id="0h7-j4-ob2"/>
                                                         </connections>
                                                     </button>
-                                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="gMh-vR-0v0" userLabel="Alarm">
+                                                    <button opaque="NO" alpha="0.59999999999999998" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="gMh-vR-0v0" userLabel="Alarm">
                                                         <rect key="frame" x="253.5" y="0.0" width="30.5" height="30"/>
                                                         <constraints>
                                                             <constraint firstAttribute="width" secondItem="gMh-vR-0v0" secondAttribute="height" multiplier="1:1" id="Uag-wM-YJU"/>
                                                         </constraints>
-                                                        <state key="normal" image="notification"/>
+                                                        <state key="normal" image="alarm"/>
                                                         <connections>
                                                             <action selector="alarmPressed:" destination="j8E-Ih-Wpi" eventType="touchUpInside" id="Uc3-fo-baM"/>
                                                         </connections>
                                                     </button>
-                                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="1Zc-LX-tft" userLabel="Move">
+                                                    <button opaque="NO" alpha="0.59999999999999998" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="1Zc-LX-tft" userLabel="Move">
                                                         <rect key="frame" x="305" y="0.0" width="30" height="30"/>
                                                         <constraints>
                                                             <constraint firstAttribute="width" secondItem="1Zc-LX-tft" secondAttribute="height" multiplier="1:1" id="bPS-K0-cUD"/>
@@ -192,12 +192,12 @@
                                                     <action selector="todayPressed:" destination="j8E-Ih-Wpi" eventType="touchUpInside" id="UHx-Mu-de1"/>
                                                 </connections>
                                             </button>
-                                            <button opaque="NO" contentMode="scaleAspectFit" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="7ki-FR-atO" userLabel="Calendar">
+                                            <button opaque="NO" alpha="0.59999999999999998" contentMode="scaleAspectFit" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="7ki-FR-atO" userLabel="Calendar">
                                                 <rect key="frame" x="223.5" y="9.5" width="30" height="30"/>
                                                 <constraints>
                                                     <constraint firstAttribute="width" secondItem="7ki-FR-atO" secondAttribute="height" multiplier="1:1" id="AQs-HQ-qub"/>
                                                 </constraints>
-                                                <state key="normal" image="calendar2"/>
+                                                <state key="normal" image="calendar"/>
                                                 <connections>
                                                     <action selector="calendarPressed:" destination="j8E-Ih-Wpi" eventType="touchUpInside" id="wRM-Lm-qpg"/>
                                                 </connections>
@@ -754,6 +754,8 @@
         </scene>
     </scenes>
     <resources>
+        <image name="alarm" width="64" height="64"/>
+        <image name="calendar" width="64" height="64"/>
         <image name="calendar-arrow" width="64" height="64"/>
         <image name="calendar2" width="64" height="64"/>
         <image name="left-arrow" width="64" height="64"/>

@@ -7,7 +7,7 @@
 //
 
 import UIKit
-
+import AudioToolbox
 
 
 class TodoItemCell: UITableViewCell {
@@ -32,20 +32,15 @@ class TodoItemCell: UITableViewCell {
     var isDone = false
     override func awakeFromNib() {
         super.awakeFromNib()
-        // Initialization code
           selectionStyle = .none
-//        textView.returnKeyType = UIReturnKeyType.done
- //       contentView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(cellTapped)))
-print(frame.height)
 
     }
     
     @IBOutlet weak var addButton: UIButton!
     @IBAction func addItemPressed(_ sender: UIButton) {
+        AudioServicesPlaySystemSound(1104)
         addButton.isHidden = true
         textView.text = ""
-   //     tableView?.addItem()
-    //    setAsAddItemCell()
         textView.isUserInteractionEnabled = true
         textView.becomeFirstResponder()
     }
@@ -81,10 +76,6 @@ print(frame.height)
         textView.attributedText = NSAttributedString(string: "")
         textView.text = ""
         addButton.isHidden = false
-        /*
-        let longPress = UILongPressGestureRecognizer(target: self, action: #selector(longTapped))
-        addButton.addGestureRecognizer(longPress)
- */
     }
     
  
@@ -116,11 +107,9 @@ print(frame.height)
     func removeGestures() {
         if let gestures = contentView.gestureRecognizers {
             for gesture in gestures {
-           //     print("remove \(gesture)")
                 contentView.removeGestureRecognizer(gesture)
             }
         }
-        
     }
     
     func removeTapGestures() {
@@ -129,18 +118,14 @@ print(frame.height)
     }
     
     @objc func swipedLeft () {
-    //    print("swiped left \(section) \(row)")
         if tableView!.swipeLocked {
-     //       print("locked")
             return
         }
         tableView?.deleteItem(ip: indexPath)
     }
 
     @objc func swipedRight () {
-   //     print("swiped right \(section) \(row)")
         if tableView!.swipeLocked {
-   //         print("locked")
             return
         }
         UIView.animate(withDuration: 0.3) {
@@ -151,28 +136,21 @@ print(frame.height)
     }
     
     @objc func singleTapped () {
-  //      print("single Tapped \(section) \(row)")
         tableView?.selectRow(ip: indexPath)
     }
     
     @objc func doubleTapped () {
- //       print("dobule Tapped \(section) \(row)")
         tableView?.unhighlight()
         textView.isUserInteractionEnabled = true
-        print("first responder")
         tableView?.activeIndexPath = indexPath
         textView.becomeFirstResponder()
     }
 
     func setBold() {
-        
         textView.attributedText = NSAttributedString(string: textView.text, attributes: boldAttributes)
     }
 
     
-    override func setSelected(_ selected: Bool, animated: Bool) {
-        super.setSelected(selected, animated: animated)
-        // Configure the view for the selected state
-    }
+
 
 }
