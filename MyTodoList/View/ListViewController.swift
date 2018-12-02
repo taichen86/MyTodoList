@@ -39,7 +39,6 @@ extension ListViewController: UITextViewDelegate, CVCalendarViewDelegate, CVCale
     
     func textViewDidBeginEditing(_ textView: UITextView) {
    //     tableView.isScrollEnabled = false
-        print("did begin editing")
         activeTextView = textView
     }
  
@@ -326,16 +325,10 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
          if let size = (not.userInfo?[UIKeyboardFrameBeginUserInfoKey] as? NSValue)?.cgRectValue {
             guard let textview = activeTextView else { return }
             let point = textview.convert(CGPoint(x: textview.frame.width, y: textview.frame.height), to: view)
-            print(point)
             let offset = view.frame.height - size.height - point.y
-            print("offset \(offset)")
-            print("offest \(tableView.contentOffset.y)")
             if offset < 0 {
-                print("scroll up!")
-      //          tableView.scrollToRow(at: activeIndexPath, at: .top, animated: true)
                 tableviewBottomConstraint.constant = size.height
                 let scrollBy = offset * -1.0 + tableView.contentOffset.y + 20
-                print("scroll by \(scrollBy)")
                 tableView.setContentOffset(CGPoint(x: 0, y: scrollBy), animated: true)
             }
          }
@@ -478,7 +471,7 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
     
     let calendarTitleFormatter  = DateFormatter()
     func presentedDateUpdated(_ date: CVDate) {
-        print("presentedDateUpdate \(date)")
+   //     print("presentedDateUpdate \(date)")
         // TODO: distinguish between slide and selected
         if let date = date.convertedDate() {
             switch cmode {
@@ -504,27 +497,31 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
     }
     
     func setAlarmFor( targetDate: Date ){
-        guard let item = highlightedCell else { return }
         
         var dc = DateComponents()
         dc = Calendar.current.dateComponents([.day,.month,.year], from: targetDate)
         dc.hour = 7
         dc.minute = 0
-        
-        let not = UNMutableNotificationContent()
-        not.title = "reminder"
-        not.body = todos[item.row][0] as! String
-        not.badge = 1
-        let trigger = UNCalendarNotificationTrigger(dateMatching: dc, repeats: false)
-        let request = UNNotificationRequest(identifier: "reminder", content: not, trigger: trigger)
-        UNUserNotificationCenter.current().add(request, withCompletionHandler: nil)
- 
-        hideBottomView()
-        
+
         let day = NSCalendar.current.date(from: dc)
         
         let alert = UIAlertController(title: "notification", message: "reminder for this task set for \n \(dateFormatter2.string(from: day!))", preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+        alert.addAction(UIAlertAction(title: "cancel", style: .cancel, handler: { (alert) in
+            self.hideBottomView()
+        }))
+        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { (alert) in
+            guard let item = self.highlightedCell else { return }
+            let not = UNMutableNotificationContent()
+            not.title = "reminder"
+            not.body = self.todos[item.row][0] as! String
+            not.badge = 1
+            let trigger = UNCalendarNotificationTrigger(dateMatching: dc, repeats: false)
+            let request = UNNotificationRequest(identifier: "reminder", content: not, trigger: trigger)
+            UNUserNotificationCenter.current().add(request, withCompletionHandler: nil)
+            AudioServicesPlaySystemSound(1105)
+
+            self.hideBottomView()
+        }))
         present(alert, animated: true, completion: nil)
         
     }
@@ -533,6 +530,7 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
         if isSameDate(date1: currentListDate, date2: targetDate) {
             return
         }
+        AudioServicesPlaySystemSound(1105)
         let listkey = dateFormatter.string(from: targetDate) + "A"
         if let item = highlightedCell {
             if userdefaults.object(forKey: listkey) == nil {
@@ -544,7 +542,6 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
                 content.append(todos[item.row])
                 userdefaults.set(content, forKey: listkey)
             }
-
             deleteItem(ip: item)
         }
         

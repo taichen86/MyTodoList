@@ -173,7 +173,7 @@
                                         <rect key="frame" x="0.0" y="0.5" width="375" height="50"/>
                                         <subviews>
                                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="4Ts-s9-Yv5" userLabel="Previous">
-                                                <rect key="frame" x="5" y="10.5" width="30" height="30"/>
+                                                <rect key="frame" x="5" y="0.5" width="50" height="50"/>
                                                 <constraints>
                                                     <constraint firstAttribute="width" secondItem="4Ts-s9-Yv5" secondAttribute="height" multiplier="1:1" id="7sc-fQ-ALs"/>
                                                 </constraints>
@@ -193,7 +193,7 @@
                                                 </connections>
                                             </button>
                                             <button opaque="NO" alpha="0.59999999999999998" contentMode="scaleAspectFit" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="7ki-FR-atO" userLabel="Calendar">
-                                                <rect key="frame" x="223.5" y="9.5" width="30" height="30"/>
+                                                <rect key="frame" x="219.5" y="-0.5" width="50" height="50"/>
                                                 <constraints>
                                                     <constraint firstAttribute="width" secondItem="7ki-FR-atO" secondAttribute="height" multiplier="1:1" id="AQs-HQ-qub"/>
                                                 </constraints>
@@ -203,7 +203,7 @@
                                                 </connections>
                                             </button>
                                             <button opaque="NO" contentMode="scaleAspectFit" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="q56-zP-td0" userLabel="Next">
-                                                <rect key="frame" x="340" y="10.5" width="30" height="30"/>
+                                                <rect key="frame" x="320" y="0.5" width="50" height="50"/>
                                                 <constraints>
                                                     <constraint firstAttribute="width" secondItem="q56-zP-td0" secondAttribute="height" multiplier="1:1" id="fT4-9l-kur"/>
                                                 </constraints>
@@ -221,9 +221,9 @@
                                             <constraint firstItem="4Ts-s9-Yv5" firstAttribute="centerY" secondItem="Puu-VC-kRe" secondAttribute="centerY" id="Kyg-KC-MaC"/>
                                             <constraint firstItem="q56-zP-td0" firstAttribute="centerY" secondItem="Puu-VC-kRe" secondAttribute="centerY" id="TbO-VU-TxW"/>
                                             <constraint firstItem="4Ts-s9-Yv5" firstAttribute="leading" secondItem="Puu-VC-kRe" secondAttribute="leading" constant="5" id="UYu-Fb-7lh"/>
-                                            <constraint firstItem="q56-zP-td0" firstAttribute="height" secondItem="Puu-VC-kRe" secondAttribute="height" multiplier="0.6" id="Ve8-V4-ofI"/>
-                                            <constraint firstItem="4Ts-s9-Yv5" firstAttribute="height" secondItem="Puu-VC-kRe" secondAttribute="height" multiplier="0.6" id="erq-0l-8xv"/>
-                                            <constraint firstItem="7ki-FR-atO" firstAttribute="leading" secondItem="gTM-9V-uAr" secondAttribute="trailing" constant="12" id="iPf-gQ-0qg"/>
+                                            <constraint firstItem="q56-zP-td0" firstAttribute="height" secondItem="Puu-VC-kRe" secondAttribute="height" id="Ve8-V4-ofI"/>
+                                            <constraint firstItem="4Ts-s9-Yv5" firstAttribute="height" secondItem="Puu-VC-kRe" secondAttribute="height" id="erq-0l-8xv"/>
+                                            <constraint firstItem="7ki-FR-atO" firstAttribute="leading" secondItem="gTM-9V-uAr" secondAttribute="trailing" constant="8" id="iPf-gQ-0qg"/>
                                             <constraint firstItem="gTM-9V-uAr" firstAttribute="centerX" secondItem="Puu-VC-kRe" secondAttribute="centerX" id="njf-Pf-b0h"/>
                                             <constraint firstAttribute="trailing" secondItem="q56-zP-td0" secondAttribute="trailing" constant="5" id="pb7-FR-PEA"/>
                                         </constraints>
