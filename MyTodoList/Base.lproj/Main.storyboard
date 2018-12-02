@@ -308,6 +308,7 @@
                         <outlet property="itemBar" destination="FtC-RU-JK1" id="Z1j-mE-JbQ"/>
                         <outlet property="moveButton" destination="1Zc-LX-tft" id="qS9-wZ-rCX"/>
                         <outlet property="tableView" destination="grb-t3-gpJ" id="Rab-lg-NYt"/>
+                        <outlet property="tableviewBottomConstraint" destination="ycr-U6-i4z" id="VhH-Dr-sOU"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="fLN-7r-Mrp" userLabel="First Responder" sceneMemberID="firstResponder"/>

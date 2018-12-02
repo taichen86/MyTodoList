@@ -160,6 +160,7 @@ print(frame.height)
         tableView?.unhighlight()
         textView.isUserInteractionEnabled = true
         print("first responder")
+        tableView?.activeIndexPath = indexPath
         textView.becomeFirstResponder()
     }
 

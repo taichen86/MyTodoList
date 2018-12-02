@@ -37,7 +37,9 @@ extension ListViewController: UITextViewDelegate, CVCalendarViewDelegate, CVCale
     }
     
     func textViewDidBeginEditing(_ textView: UITextView) {
-        tableView.isScrollEnabled = false
+   //     tableView.isScrollEnabled = false
+        print("did begin editing")
+        activeTextView = textView
     }
  
     func textViewDidEndEditing(_ textView: UITextView) {
@@ -67,12 +69,14 @@ extension ListViewController: UITextViewDelegate, CVCalendarViewDelegate, CVCale
 
 
 class ListViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, IAPDelegate {
+    var activeTextView : UITextView?
 
     var todos = [[Any]]() // 0 - text , 1 - color
     var dones = [[Any]]()
     
     @IBOutlet weak var tableView: UITableView!
-
+    @IBOutlet weak var tableviewBottomConstraint: NSLayoutConstraint!
+    
     var currentListDate = Date()
     let dateFormatter2 = DateFormatter()
     let dayFormatter = DateFormatter()
@@ -100,7 +104,7 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
         tableView.dataSource = self
         tableView.backgroundColor = colors[4]
        
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: .UIKeyboardWillShow, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardDidShow), name: .UIKeyboardDidShow, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: .UIKeyboardWillHide, object: nil)
         
         bottomViewHeight.constant = 0.07 * view.bounds.height
@@ -324,9 +328,30 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
         }*/
     }
     
+    var activeIndexPath = IndexPath(row: 0, section: 0)
+    @objc func keyboardDidShow(not: NSNotification) {
+         if let size = (not.userInfo?[UIKeyboardFrameBeginUserInfoKey] as? NSValue)?.cgRectValue {
+            guard let textview = activeTextView else { return }
+            let point = textview.convert(CGPoint(x: textview.frame.width, y: textview.frame.height), to: view)
+            print(point)
+            let offset = view.frame.height - size.height - point.y
+            print("offset \(offset)")
+            print("offest \(tableView.contentOffset.y)")
+            if offset < 0 {
+                print("scroll up!")
+      //          tableView.scrollToRow(at: activeIndexPath, at: .top, animated: true)
+                tableviewBottomConstraint.constant = size.height
+                let scrollBy = offset * -1.0 + tableView.contentOffset.y + 20
+                print("scroll by \(scrollBy)")
+                tableView.setContentOffset(CGPoint(x: 0, y: scrollBy), animated: true)
+            }
+         }
+    }
+    
     @objc func keyboardWillHide() {
         self.bottomViewHeight.constant = 0
         UIView.animate(withDuration: 0.33) {
+            self.tableviewBottomConstraint.constant = 0
              self.view.layoutIfNeeded()
         }
     }
@@ -656,7 +681,7 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
     
     var cellHeights = [Int:CGFloat]()
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        print("cellForRowAt \(indexPath.section) row \(indexPath.row)")
+    //    print("cellForRowAt \(indexPath.section) row \(indexPath.row)")
         let cell = tableView.dequeueReusableCell(withIdentifier: "TodoItemCell", for: indexPath) as! TodoItemCell
         
 
@@ -705,14 +730,14 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
     }
     
     func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
-        print("estimated height: \(cellHeights[indexPath.row])")
+   //     print("estimated height: \(cellHeights[indexPath.row])")
         return cellHeights[indexPath.row] ?? 100.0
     }
     
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         cellHeights[indexPath.row] = cell.frame.size.height
-        print("cell height \(cell.frame.height)")
-
+ //       print("cell height \(cell.frame.height)")
+//
     }
     
     // --------   SELECT ROW ---------------
