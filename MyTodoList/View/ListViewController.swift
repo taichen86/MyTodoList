@@ -82,7 +82,7 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
     let dayFormatter = DateFormatter()
     let dateFormatter = DateFormatter()
     let userdefaults = UserDefaults.standard
-    var listKey = "list" // Daily 01.12.2018, Weekly 01.12.2018, Monthly 10.2018
+    var listKey = "list"
     
 
     
@@ -97,17 +97,14 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        createObservers()
         
+        createObservers()
         IAP.instance.iapDelegate = self
         
         tableView.delegate = self
         tableView.dataSource = self
         tableView.backgroundColor = colors[4]
        
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardDidShow), name: .UIKeyboardDidShow, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: .UIKeyboardWillHide, object: nil)
-        
         bottomViewHeight.constant = 0.07 * view.bounds.height
         
         // show date
@@ -317,9 +314,7 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
         userdefaults.set(dones, forKey: "\(listKey)B")
     }
     
-    @objc func keyboardWillShow(not: NSNotification) {
-    }
-    
+  
     var activeIndexPath = IndexPath(row: 0, section: 0)
     @objc func keyboardDidShow(not: NSNotification) {
          if let size = (not.userInfo?[UIKeyboardFrameBeginUserInfoKey] as? NSValue)?.cgRectValue {
@@ -516,10 +511,9 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
             not.body = self.todos[item.row][0] as! String
             not.badge = 1
             let trigger = UNCalendarNotificationTrigger(dateMatching: dc, repeats: false)
-            let request = UNNotificationRequest(identifier: "reminder", content: not, trigger: trigger)
+            let request = UNNotificationRequest(identifier: String(not.body.hashValue), content: not, trigger: trigger)
             UNUserNotificationCenter.current().add(request, withCompletionHandler: nil)
             AudioServicesPlaySystemSound(1105)
-
             self.hideBottomView()
         }))
         present(alert, animated: true, completion: nil)
@@ -780,8 +774,9 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
     }
     
     // MARK: notification observers
-    
     func createObservers() {
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardDidShow), name: .UIKeyboardDidShow, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: .UIKeyboardWillHide, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(refreshView), name: importNotificationName, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(showImportErrorAlert), name: importErrorNotificationName, object: nil)
     }

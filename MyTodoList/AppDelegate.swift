@@ -14,20 +14,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
-        /*
-        let path = NSSearchPathForDirectoriesInDomains(.libraryDirectory, .userDomainMask, true)
-        let filepath = "\(path[0])/Preferences/com.TPBSoftware.DailyTodoList.plist"
-        let size = try? FileManager.default.attributesOfItem(atPath: filepath)
-         */
-        
         IAP.instance.fetchProducts()
-        UIApplication.shared.applicationIconBadgeNumber = 0
         return true
     }
     
     
     func application(_ app: UIApplication, open url: URL, options: [UIApplicationOpenURLOptionsKey : Any] = [:]) -> Bool {
-  //      print("OPENING!! \(url)")
         do{
             let data = try Data(contentsOf: url)
             var editedDict = [String:[[Any]]]()
@@ -39,8 +31,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                             editedDict[list.key] = items
                         }
                     }
-                    
-                    
                 }
 
                 for backupList in editedDict {
@@ -83,6 +73,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func applicationDidBecomeActive(_ application: UIApplication) {
         // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
+        UIApplication.shared.applicationIconBadgeNumber = 0
     }
 
     func applicationWillTerminate(_ application: UIApplication) {
